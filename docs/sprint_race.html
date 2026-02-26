@@ -40,6 +40,23 @@
             top: 20px;
         }
         
+        .sidebar-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+            background: none;
+            border: none;
+        }
+        
+        .sidebar-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #667eea;
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+        
         .sidebar-content h3 {
             color: #667eea;
             margin-bottom: 20px;
@@ -133,6 +150,13 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 30px;
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .chart-container > div {
+            width: 100% !important;
+            height: 500px !important;
         }
         
         .table-container {
@@ -181,7 +205,7 @@
             border-top: 1px solid #e0e0e0;
         }
         
-        @media (max-width: 968px) {
+        @media (max-width: 1024px) {
             .main-wrapper {
                 flex-direction: column;
             }
@@ -189,6 +213,7 @@
             .sidebar {
                 width: 100%;
                 position: static;
+                max-height: none;
             }
             
             header h1 {
@@ -203,11 +228,174 @@
                 padding: 8px;
             }
         }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .main-wrapper {
+                gap: 12px;
+            }
+            
+            .sidebar {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+            
+            .sidebar.active {
+                max-height: 600px;
+            }
+            
+            .sidebar-toggle {
+                display: flex;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+            
+            header h1 {
+                font-size: 1.3em;
+                margin-bottom: 5px;
+            }
+            
+            header p {
+                font-size: 0.9em;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .section h2 {
+                font-size: 1.3em;
+                margin-bottom: 15px;
+            }
+            
+            .chart-container {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .table-container {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            table {
+                font-size: 0.75em;
+            }
+            
+            table th, table td {
+                padding: 6px;
+            }
+            
+            .sidebar-content h3 {
+                font-size: 1em;
+            }
+            
+            .section-group a {
+                font-size: 0.85em;
+                padding: 6px 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .main-wrapper {
+                gap: 8px;
+            }
+            
+            header {
+                padding: 15px 10px;
+                border-radius: 8px 8px 0 0;
+            }
+            
+            header h1 {
+                font-size: 1.1em;
+                margin-bottom: 3px;
+            }
+            
+            header p {
+                font-size: 0.8em;
+            }
+            
+            .container {
+                border-radius: 8px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+            }
+            
+            .section {
+                margin-bottom: 25px;
+            }
+            
+            .section h2 {
+                font-size: 1.1em;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+            }
+            
+            .chart-container {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .table-container {
+                padding: 10px;
+                margin-bottom: 15px;
+                overflow-x: auto;
+            }
+            
+            table {
+                font-size: 0.65em;
+                min-width: 100%;
+            }
+            
+            table th, table td {
+                padding: 4px;
+            }
+            
+            .sidebar-content h3 {
+                font-size: 0.9em;
+                margin-bottom: 15px;
+            }
+            
+            .section-group h4 {
+                font-size: 0.75em;
+                margin-bottom: 8px;
+            }
+            
+            .section-group a {
+                font-size: 0.75em;
+                padding: 5px 8px;
+                margin-bottom: 5px;
+            }
+            
+            .footer {
+                padding: 15px 10px;
+                font-size: 0.75em;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="main-wrapper">
-        <nav class="sidebar"><div class="sidebar-content"><h3>📊 Dashboard</h3><div class="section-group"><h4>Sprint</h4><ul><li><a href="sprint_race.html" class="active">Race Pace</a></li><li><a href="sprint_quali.html" class="">Quali Pace</a></li></ul></div><div class="section-group"><h4>Multiclass P2UR</h4><ul><li><a href="multiclass_p2ur_race.html" class="">Race Pace</a></li><li><a href="multiclass_p2ur_quali.html" class="">Quali Pace</a></li></ul></div><div class="section-group"><h4>Multiclass GT3</h4><ul><li><a href="multiclass_gt3_race.html" class="">Race Pace</a></li><li><a href="multiclass_gt3_quali.html" class="">Quali Pace</a></li></ul></div></nav>
+        
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <nav class="sidebar"><div class="sidebar-content"><h3>📊 Dashboard</h3><div class="section-group"><h4>Sprint</h4><ul><li><a href="sprint_race.html" class="active">Race Pace</a></li><li><a href="sprint_quali.html" class="">Quali Pace</a></li></ul></div><div class="section-group"><h4>Multiclass P2UR</h4><ul><li><a href="multiclass_p2ur_race.html" class="">Race Pace</a></li><li><a href="multiclass_p2ur_quali.html" class="">Quali Pace</a></li></ul></div><div class="section-group"><h4>Multiclass GT3</h4><ul><li><a href="multiclass_gt3_race.html" class="">Race Pace</a></li><li><a href="multiclass_gt3_quali.html" class="">Quali Pace</a></li></ul></div></nav>
+    
         <div class="container">
             <header>
                 <h1>🏁 Sprint Race Pace</h1>
@@ -219,7 +407,7 @@
                 <div class="section">
                     <h2>Pace Trend by Round</h2>
                     <div class="chart-container">
-                        <div id="paceChart" style="width:100%;height:700px;"></div>
+                        <div id="paceChart" style="width:100%;"></div>
                     </div>
                 </div>
                 
@@ -713,16 +901,40 @@
             
             <div class="footer">
                 <p>Generated from OOFS S3 XML Race Data</p>
-                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: 2026-02-26 11:47:03</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: 2026-02-26 11:59:20</p>
             </div>
         </div>
     </div>
     
     <script>
-        const plotData = [{"x": [1, 2, 3, 4], "y": [102.37, 101.85, 100.91, 101.84], "mode": "lines+markers", "name": "Guillermo Paret", "hovertemplate": "<b>Guillermo Paret</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 4], "y": [101.0, 101.02, 100.94], "mode": "lines+markers", "name": "Joris Butkus", "hovertemplate": "<b>Joris Butkus</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [2, 4], "y": [100.96, 102.18], "mode": "lines+markers", "name": "Avinash Ganti", "hovertemplate": "<b>Avinash Ganti</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.01, 101.17, 101.23, 101.18], "mode": "lines+markers", "name": "Greg Kachadurian", "hovertemplate": "<b>Greg Kachadurian</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [101.98, 101.28, 101.29, 101.71], "mode": "lines+markers", "name": "Michael Landry", "hovertemplate": "<b>Michael Landry</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.0, 101.71, 101.3, 101.9], "mode": "lines+markers", "name": "Donovan Bailey", "hovertemplate": "<b>Donovan Bailey</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 4], "y": [102.26, 101.78, 101.35, 101.9], "mode": "lines+markers", "name": "Jeffrey Aroyan", "hovertemplate": "<b>Jeffrey Aroyan</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.06, 102.5, 101.6, 101.62, 102.15], "mode": "lines+markers", "name": "Cyril Fortin", "hovertemplate": "<b>Cyril Fortin</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [2, 3, 4], "y": [102.68, 101.75, 102.39], "mode": "lines+markers", "name": "Kelyan Locatelli", "hovertemplate": "<b>Kelyan Locatelli</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 4], "y": [103.46, 101.84, 102.61], "mode": "lines+markers", "name": "John Pflibsen", "hovertemplate": "<b>John Pflibsen</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [4], "y": [101.9], "mode": "lines+markers", "name": "William Neron", "hovertemplate": "<b>William Neron</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.39, 101.91, 102.08, 102.26], "mode": "lines+markers", "name": "Josh Popov", "hovertemplate": "<b>Josh Popov</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.18, 101.91, 102.03, 102.37, 101.91], "mode": "lines+markers", "name": "Willie Mangram", "hovertemplate": "<b>Willie Mangram</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 3, 4], "y": [102.34, 102.15, 101.94, 102.57], "mode": "lines+markers", "name": "Harrison Miller", "hovertemplate": "<b>Harrison Miller</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.91, 102.79, 101.97, 102.17, 102.6], "mode": "lines+markers", "name": "Philippe Brazeau", "hovertemplate": "<b>Philippe Brazeau</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 3, 4], "y": [102.99, 102.08, 102.29], "mode": "lines+markers", "name": "Louis Gendron", "hovertemplate": "<b>Louis Gendron</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.62, 102.95, 102.5, 102.18, 102.71], "mode": "lines+markers", "name": "Ricardo Swaby", "hovertemplate": "<b>Ricardo Swaby</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 3, 4], "y": [103.35, 102.41, 102.48, 102.2], "mode": "lines+markers", "name": "Parker Thomas", "hovertemplate": "<b>Parker Thomas</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.69, 102.85, 102.72, 102.33, 102.87], "mode": "lines+markers", "name": "Alexandre Urie", "hovertemplate": "<b>Alexandre Urie</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 3, 4], "y": [103.97, 103.89, 102.48, 102.54], "mode": "lines+markers", "name": "Nick Johnson", "hovertemplate": "<b>Nick Johnson</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.34, 103.08, 103.06, 102.53, 102.6], "mode": "lines+markers", "name": "Dustin Rand", "hovertemplate": "<b>Dustin Rand</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.08, 102.82, 105.4, 104.58, 103.62], "mode": "lines+markers", "name": "Ross McLean", "hovertemplate": "<b>Ross McLean</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 3, 4], "y": [103.56, 102.82, 103.15], "mode": "lines+markers", "name": "Preston Parenti", "hovertemplate": "<b>Preston Parenti</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [4], "y": [102.89], "mode": "lines+markers", "name": "Richie Wood", "hovertemplate": "<b>Richie Wood</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.63, 103.35, 102.91, 105.93, 103.17], "mode": "lines+markers", "name": "David St-Germain", "hovertemplate": "<b>David St-Germain</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [104.12, 103.8, 103.15, 103.36, 103.67], "mode": "lines+markers", "name": "Hans Montes", "hovertemplate": "<b>Hans Montes</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 4], "y": [104.58, 104.17, 103.5, 103.46], "mode": "lines+markers", "name": "Dave Carter", "hovertemplate": "<b>Dave Carter</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 4], "y": [103.75, 103.81, 103.95], "mode": "lines+markers", "name": "Dan Gomez", "hovertemplate": "<b>Dan Gomez</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}];
-        const plotLayout = {"title": "Sprint Race Pace Trend: After 5 Rounds", "xaxis": {"tickmode": "array", "ticktext": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "tickvals": [0, 1, 2, 3, 4]}, "yaxis": {"title": "Race Pace % (vs Alien)", "range": [100.0, 107.0]}, "hovermode": "closest", "plot_bgcolor": "rgba(240, 240, 240, 0.5)", "height": 700, "width": 1000, "showlegend": false, "xaxis_range": [-0.6, 4.6]};
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
         
-        Plotly.newPlot('paceChart', plotData, plotLayout, {responsive: true});
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+            
+            // Close sidebar when a link is clicked
+            const sidebarLinks = sidebar.querySelectorAll('a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                });
+            });
+        }
+        
+        // Plotly chart initialization
+        const plotData = [{"x": [1, 2, 3, 4], "y": [102.37, 101.85, 100.91, 101.84], "mode": "lines+markers", "name": "Guillermo Paret", "hovertemplate": "<b>Guillermo Paret</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 4], "y": [101.0, 101.02, 100.94], "mode": "lines+markers", "name": "Joris Butkus", "hovertemplate": "<b>Joris Butkus</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [2, 4], "y": [100.96, 102.18], "mode": "lines+markers", "name": "Avinash Ganti", "hovertemplate": "<b>Avinash Ganti</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.01, 101.17, 101.23, 101.18], "mode": "lines+markers", "name": "Greg Kachadurian", "hovertemplate": "<b>Greg Kachadurian</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [101.98, 101.28, 101.29, 101.71], "mode": "lines+markers", "name": "Michael Landry", "hovertemplate": "<b>Michael Landry</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.0, 101.71, 101.3, 101.9], "mode": "lines+markers", "name": "Donovan Bailey", "hovertemplate": "<b>Donovan Bailey</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 4], "y": [102.26, 101.78, 101.35, 101.9], "mode": "lines+markers", "name": "Jeffrey Aroyan", "hovertemplate": "<b>Jeffrey Aroyan</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.06, 102.5, 101.6, 101.62, 102.15], "mode": "lines+markers", "name": "Cyril Fortin", "hovertemplate": "<b>Cyril Fortin</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [2, 3, 4], "y": [102.68, 101.75, 102.39], "mode": "lines+markers", "name": "Kelyan Locatelli", "hovertemplate": "<b>Kelyan Locatelli</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 4], "y": [103.46, 101.84, 102.61], "mode": "lines+markers", "name": "John Pflibsen", "hovertemplate": "<b>John Pflibsen</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [4], "y": [101.9], "mode": "lines+markers", "name": "William Neron", "hovertemplate": "<b>William Neron</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.39, 101.91, 102.08, 102.26], "mode": "lines+markers", "name": "Josh Popov", "hovertemplate": "<b>Josh Popov</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.18, 101.91, 102.03, 102.37, 101.91], "mode": "lines+markers", "name": "Willie Mangram", "hovertemplate": "<b>Willie Mangram</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 3, 4], "y": [102.34, 102.15, 101.94, 102.57], "mode": "lines+markers", "name": "Harrison Miller", "hovertemplate": "<b>Harrison Miller</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.91, 102.79, 101.97, 102.17, 102.6], "mode": "lines+markers", "name": "Philippe Brazeau", "hovertemplate": "<b>Philippe Brazeau</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 3, 4], "y": [102.99, 102.08, 102.29], "mode": "lines+markers", "name": "Louis Gendron", "hovertemplate": "<b>Louis Gendron</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.62, 102.95, 102.5, 102.18, 102.71], "mode": "lines+markers", "name": "Ricardo Swaby", "hovertemplate": "<b>Ricardo Swaby</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 3, 4], "y": [103.35, 102.41, 102.48, 102.2], "mode": "lines+markers", "name": "Parker Thomas", "hovertemplate": "<b>Parker Thomas</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.69, 102.85, 102.72, 102.33, 102.87], "mode": "lines+markers", "name": "Alexandre Urie", "hovertemplate": "<b>Alexandre Urie</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 3, 4], "y": [103.97, 103.89, 102.48, 102.54], "mode": "lines+markers", "name": "Nick Johnson", "hovertemplate": "<b>Nick Johnson</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.34, 103.08, 103.06, 102.53, 102.6], "mode": "lines+markers", "name": "Dustin Rand", "hovertemplate": "<b>Dustin Rand</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.08, 102.82, 105.4, 104.58, 103.62], "mode": "lines+markers", "name": "Ross McLean", "hovertemplate": "<b>Ross McLean</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 3, 4], "y": [103.56, 102.82, 103.15], "mode": "lines+markers", "name": "Preston Parenti", "hovertemplate": "<b>Preston Parenti</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [4], "y": [102.89], "mode": "lines+markers", "name": "Richie Wood", "hovertemplate": "<b>Richie Wood</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.63, 103.35, 102.91, 105.93, 103.17], "mode": "lines+markers", "name": "David St-Germain", "hovertemplate": "<b>David St-Germain</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [104.12, 103.8, 103.15, 103.36, 103.67], "mode": "lines+markers", "name": "Hans Montes", "hovertemplate": "<b>Hans Montes</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 4], "y": [104.58, 104.17, 103.5, 103.46], "mode": "lines+markers", "name": "Dave Carter", "hovertemplate": "<b>Dave Carter</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 4], "y": [103.75, 103.81, 103.95], "mode": "lines+markers", "name": "Dan Gomez", "hovertemplate": "<b>Dan Gomez</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}];
+        const plotLayout = {"title": "Sprint Race Pace Trend: After 5 Rounds", "xaxis": {"tickmode": "array", "ticktext": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "tickvals": [0, 1, 2, 3, 4]}, "yaxis": {"title": "Race Pace % (vs Alien)", "range": [100.0, 107.0]}, "hovermode": "closest", "plot_bgcolor": "rgba(240, 240, 240, 0.5)", "height": 500, "autosize": true, "showlegend": false, "xaxis_range": [-0.6, 4.6], "margin": {"l": 50, "r": 20, "b": 50, "t": 60}};
+        
+        Plotly.newPlot('paceChart', plotData, plotLayout, {responsive: true, displayModeBar: false});
+        
+        // Handle responsive resizing
+        window.addEventListener('resize', function() {
+            Plotly.Plots.resize('paceChart');
+        });
     </script>
 </body>
 </html>

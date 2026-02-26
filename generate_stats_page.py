@@ -441,10 +441,11 @@ def create_plotly_json(df_display_renamed, track_names, chart_title, y_axis_titl
             },
             'hovermode': 'closest',
             'plot_bgcolor': 'rgba(240, 240, 240, 0.5)',
-            'height': 700,
-            'width': 1000,
+            'height': 500,
+            'autosize': True,
             'showlegend': False,
-            'xaxis_range': [-0.6, len(track_names) - 1 + 0.6]
+            'xaxis_range': [-0.6, len(track_names) - 1 + 0.6],
+            'margin': {'l': 50, 'r': 20, 'b': 50, 't': 60}
         }
     }
 
@@ -512,6 +513,23 @@ def get_css_styles():
             height: fit-content;
             position: sticky;
             top: 20px;
+        }
+        
+        .sidebar-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+            background: none;
+            border: none;
+        }
+        
+        .sidebar-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #667eea;
+            margin: 5px 0;
+            transition: 0.3s;
         }
         
         .sidebar-content h3 {
@@ -607,6 +625,13 @@ def get_css_styles():
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 30px;
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .chart-container > div {
+            width: 100% !important;
+            height: 500px !important;
         }
         
         .table-container {
@@ -655,7 +680,7 @@ def get_css_styles():
             border-top: 1px solid #e0e0e0;
         }
         
-        @media (max-width: 968px) {
+        @media (max-width: 1024px) {
             .main-wrapper {
                 flex-direction: column;
             }
@@ -663,6 +688,7 @@ def get_css_styles():
             .sidebar {
                 width: 100%;
                 position: static;
+                max-height: none;
             }
             
             header h1 {
@@ -677,6 +703,162 @@ def get_css_styles():
                 padding: 8px;
             }
         }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .main-wrapper {
+                gap: 12px;
+            }
+            
+            .sidebar {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+            
+            .sidebar.active {
+                max-height: 600px;
+            }
+            
+            .sidebar-toggle {
+                display: flex;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+            
+            header h1 {
+                font-size: 1.3em;
+                margin-bottom: 5px;
+            }
+            
+            header p {
+                font-size: 0.9em;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .section h2 {
+                font-size: 1.3em;
+                margin-bottom: 15px;
+            }
+            
+            .chart-container {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .table-container {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            table {
+                font-size: 0.75em;
+            }
+            
+            table th, table td {
+                padding: 6px;
+            }
+            
+            .sidebar-content h3 {
+                font-size: 1em;
+            }
+            
+            .section-group a {
+                font-size: 0.85em;
+                padding: 6px 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .main-wrapper {
+                gap: 8px;
+            }
+            
+            header {
+                padding: 15px 10px;
+                border-radius: 8px 8px 0 0;
+            }
+            
+            header h1 {
+                font-size: 1.1em;
+                margin-bottom: 3px;
+            }
+            
+            header p {
+                font-size: 0.8em;
+            }
+            
+            .container {
+                border-radius: 8px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+            }
+            
+            .section {
+                margin-bottom: 25px;
+            }
+            
+            .section h2 {
+                font-size: 1.1em;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+            }
+            
+            .chart-container {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .table-container {
+                padding: 10px;
+                margin-bottom: 15px;
+                overflow-x: auto;
+            }
+            
+            table {
+                font-size: 0.65em;
+                min-width: 100%;
+            }
+            
+            table th, table td {
+                padding: 4px;
+            }
+            
+            .sidebar-content h3 {
+                font-size: 0.9em;
+                margin-bottom: 15px;
+            }
+            
+            .section-group h4 {
+                font-size: 0.75em;
+                margin-bottom: 8px;
+            }
+            
+            .section-group a {
+                font-size: 0.75em;
+                padding: 5px 8px;
+                margin-bottom: 5px;
+            }
+            
+            .footer {
+                padding: 15px 10px;
+                font-size: 0.75em;
+            }
+        }
     """
 
 
@@ -684,6 +866,16 @@ def generate_page(title, subtitle, sidebar_file, pace_html, improvement_html, pl
     """Generate an HTML page with sidebar"""
     sidebar = get_sidebar_html(sidebar_file)
     css = get_css_styles()
+    
+    # Create sidebar HTML with toggle button
+    sidebar_section = f"""
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    {sidebar}
+    """
     
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -696,7 +888,7 @@ def generate_page(title, subtitle, sidebar_file, pace_html, improvement_html, pl
 </head>
 <body>
     <div class="main-wrapper">
-        {sidebar}
+        {sidebar_section}
         <div class="container">
             <header>
                 <h1>{title}</h1>
@@ -708,7 +900,7 @@ def generate_page(title, subtitle, sidebar_file, pace_html, improvement_html, pl
                 <div class="section">
                     <h2>Pace Trend by Round</h2>
                     <div class="chart-container">
-                        <div id="paceChart" style="width:100%;height:700px;"></div>
+                        <div id="paceChart" style="width:100%;"></div>
                     </div>
                 </div>
                 
@@ -738,10 +930,34 @@ def generate_page(title, subtitle, sidebar_file, pace_html, improvement_html, pl
     </div>
     
     <script>
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (sidebarToggle && sidebar) {{
+            sidebarToggle.addEventListener('click', function() {{
+                sidebar.classList.toggle('active');
+            }});
+            
+            // Close sidebar when a link is clicked
+            const sidebarLinks = sidebar.querySelectorAll('a');
+            sidebarLinks.forEach(link => {{
+                link.addEventListener('click', function() {{
+                    sidebar.classList.remove('active');
+                }});
+            }});
+        }}
+        
+        // Plotly chart initialization
         const plotData = {json.dumps(plotly_data['traces'])};
         const plotLayout = {json.dumps(plotly_data['layout'])};
         
-        Plotly.newPlot('paceChart', plotData, plotLayout, {{responsive: true}});
+        Plotly.newPlot('paceChart', plotData, plotLayout, {{responsive: true, displayModeBar: false}});
+        
+        // Handle responsive resizing
+        window.addEventListener('resize', function() {{
+            Plotly.Plots.resize('paceChart');
+        }});
     </script>
 </body>
 </html>
