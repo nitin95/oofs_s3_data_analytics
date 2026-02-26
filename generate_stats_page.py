@@ -315,6 +315,9 @@ def process_races_into_comparison_df(dfs_dict, race_codes, code_to_track):
     
     # Clean up
     comparison_df = comparison_df.replace(0.00, np.nan).dropna(subset=pace_cols, how='all')
+    # Replace any entries over 107% with NaN to filter out outliers
+    for col in pace_cols:
+        comparison_df[col] = comparison_df[col].apply(lambda x: x if pd.isna(x) or x <= 107.0 else np.nan)
     comparison_df = comparison_df.sort_values('Driver_name').reset_index(drop=True)
     
     return comparison_df, pace_cols
