@@ -362,6 +362,11 @@ def generate_html_tables(comparison_df, improvement_df, track_names):
     
     pace_table_df = comparison_df[['Driver_name'] + pace_cols].copy()
     
+    # Convert driver names to "F. Lastname" format for space efficiency
+    pace_table_df['Driver_name'] = pace_table_df['Driver_name'].apply(
+        lambda x: f"{x.split()[0][0]}. {' '.join(x.split()[1:])}" if len(x.split()) > 1 else x
+    )
+    
     # Build rename mapping for pace table
     pace_rename = {'Driver_name': 'Driver'}
     for track, col in zip(track_names, pace_cols):
