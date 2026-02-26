@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Race Pace Statistics</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 20px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+        
+        table thead {
+            background: #667eea;
+            color: white;
+        }
+        
+        table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        table tbody tr:hover {
+            background: #e8eaf6;
+        }
+        
+        table tbody tr:nth-child(even) {
+            background: #f5f5f5;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px 10px;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            table th, table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏁 Sprint Race Pace Statistics</h1>
+            <p>Performance Analysis Across 5 Championship Rounds</p>
+        </header>
+        
+        <div class="content">
+            <!-- Pace Trend Chart -->
+            <div class="section">
+                <h2>Race Pace Trend by Round</h2>
+                <div class="chart-container">
+                    <div id="paceChart" style="width:100%;height:700px;"></div>
+                </div>
+            </div>
+            
+            <!-- Pace vs Alien Table -->
+            <div class="section">
+                <h2>Pace vs Alien - All Races</h2>
+                <div class="table-container">
+                    <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Driver</th>
+      <th>Portimao</th>
+      <th>Le Mans</th>
+      <th>Interlagos</th>
+      <th>Monza</th>
+      <th>Sebring</th>
+      <th>Diff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Adam KH</td>
+      <td>0.00</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Alessandro Guevara</td>
+      <td>103.76</td>
+      <td>0.00</td>
+      <td>103.66</td>
+      <td>NaN</td>
+      <td>0.00</td>
+      <td>103.76</td>
+    </tr>
+    <tr>
+      <td>Alexandre Urie</td>
+      <td>102.69</td>
+      <td>102.85</td>
+      <td>102.72</td>
+      <td>102.33</td>
+      <td>102.87</td>
+      <td>-0.18</td>
+    </tr>
+    <tr>
+      <td>Andrew Canelli</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>102.39</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Avinash Ganti</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>100.96</td>
+      <td>NaN</td>
+      <td>102.18</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Ayrton Torres</td>
+      <td>NaN</td>
+      <td>104.22</td>
+      <td>NaN</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Cyril Fortin</td>
+      <td>102.06</td>
+      <td>102.50</td>
+      <td>101.60</td>
+      <td>101.62</td>
+      <td>102.15</td>
+      <td>-0.09</td>
+    </tr>
+    <tr>
+      <td>Dakota Botello</td>
+      <td>101.97</td>
+      <td>101.68</td>
+      <td>101.33</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Dan Gomez</td>
+      <td>103.75</td>
+      <td>103.81</td>
+      <td>NaN</td>
+      <td>0.00</td>
+      <td>103.95</td>
+      <td>-0.20</td>
+    </tr>
+    <tr>
+      <td>Dave Carter</td>
+      <td>104.58</td>
+      <td>104.17</td>
+      <td>103.50</td>
+      <td>NaN</td>
+      <td>103.46</td>
+      <td>1.12</td>
+    </tr>
+    <tr>
+      <td>David St-Germain</td>
+      <td>103.63</td>
+      <td>103.35</td>
+      <td>102.91</td>
+      <td>105.93</td>
+      <td>103.17</td>
+      <td>0.46</td>
+    </tr>
+    <tr>
+      <td>Dennis Torres</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Donovan Bailey</td>
+      <td>102.00</td>
+      <td>NaN</td>
+      <td>101.71</td>
+      <td>101.30</td>
+      <td>101.90</td>
+      <td>0.10</td>
+    </tr>
+    <tr>
+      <td>Dustin Rand</td>
+      <td>103.34</td>
+      <td>103.08</td>
+      <td>103.06</td>
+      <td>102.53</td>
+      <td>102.60</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>Ethan Gonzales</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>102.10</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Fred Filion</td>
+      <td>105.19</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Greg Kachadurian</td>
+      <td>102.01</td>
+      <td>NaN</td>
+      <td>101.17</td>
+      <td>101.23</td>
+      <td>101.18</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>Guillermo Paret</td>
+      <td>NaN</td>
+      <td>102.37</td>
+      <td>101.85</td>
+      <td>100.91</td>
+      <td>101.84</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Hans Montes</td>
+      <td>104.12</td>
+      <td>103.80</td>
+      <td>103.15</td>
+      <td>103.36</td>
+      <td>103.67</td>
+      <td>0.45</td>
+    </tr>
+    <tr>
+      <td>Harrison Miller</td>
+      <td>NaN</td>
+      <td>102.34</td>
+      <td>102.15</td>
+      <td>101.94</td>
+      <td>102.57</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>J P#2423</td>
+      <td>119.59</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Jacob Palmieri</td>
+      <td>101.03</td>
+      <td>0.00</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Jeffrey Aroyan</td>
+      <td>102.26</td>
+      <td>101.78</td>
+      <td>101.35</td>
+      <td>NaN</td>
+      <td>101.90</td>
+      <td>0.36</td>
+    </tr>
+    <tr>
+      <td>John Pflibsen</td>
+      <td>NaN</td>
+      <td>103.46</td>
+      <td>101.84</td>
+      <td>0.00</td>
+      <td>102.61</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Joris Butkus</td>
+      <td>101.00</td>
+      <td>NaN</td>
+      <td>101.02</td>
+      <td>NaN</td>
+      <td>100.94</td>
+      <td>0.06</td>
+    </tr>
+    <tr>
+      <td>Josh Popov</td>
+      <td>102.39</td>
+      <td>NaN</td>
+      <td>101.91</td>
+      <td>102.08</td>
+      <td>102.26</td>
+      <td>0.13</td>
+    </tr>
+    <tr>
+      <td>Kelyan Locatelli</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>102.68</td>
+      <td>101.75</td>
+      <td>102.39</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Louis Gendron</td>
+      <td>102.99</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>102.08</td>
+      <td>102.29</td>
+      <td>0.70</td>
+    </tr>
+    <tr>
+      <td>Maximum Angry</td>
+      <td>104.80</td>
+      <td>105.56</td>
+      <td>103.63</td>
+      <td>103.89</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Michael Landry</td>
+      <td>101.98</td>
+      <td>0.00</td>
+      <td>101.28</td>
+      <td>101.29</td>
+      <td>101.71</td>
+      <td>0.27</td>
+    </tr>
+    <tr>
+      <td>Nick Johnson</td>
+      <td>103.97</td>
+      <td>103.89</td>
+      <td>0.00</td>
+      <td>102.48</td>
+      <td>102.54</td>
+      <td>1.43</td>
+    </tr>
+    <tr>
+      <td>Nitin Murthy</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>Parker Thomas</td>
+      <td>NaN</td>
+      <td>103.35</td>
+      <td>102.41</td>
+      <td>102.48</td>
+      <td>102.20</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Philippe Brazeau</td>
+      <td>102.91</td>
+      <td>102.79</td>
+      <td>101.97</td>
+      <td>102.17</td>
+      <td>102.60</td>
+      <td>0.31</td>
+    </tr>
+    <tr>
+      <td>Preston Parenti</td>
+      <td>103.56</td>
+      <td>0.00</td>
+      <td>NaN</td>
+      <td>102.82</td>
+      <td>103.15</td>
+      <td>0.41</td>
+    </tr>
+    <tr>
+      <td>Ricardo Swaby</td>
+      <td>103.62</td>
+      <td>102.95</td>
+      <td>102.50</td>
+      <td>102.18</td>
+      <td>102.71</td>
+      <td>0.91</td>
+    </tr>
+    <tr>
+      <td>Richie Wood</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>102.89</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Ross McLean</td>
+      <td>103.08</td>
+      <td>102.82</td>
+      <td>105.40</td>
+      <td>104.58</td>
+      <td>103.62</td>
+      <td>-0.54</td>
+    </tr>
+    <tr>
+      <td>Sam Staples</td>
+      <td>NaN</td>
+      <td>0.00</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>William Neron</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>101.90</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Willie Mangram</td>
+      <td>102.18</td>
+      <td>101.91</td>
+      <td>102.03</td>
+      <td>102.37</td>
+      <td>101.91</td>
+      <td>0.27</td>
+    </tr>
+  </tbody>
+</table>
+                </div>
+            </div>
+            
+            <!-- Improvement Comparison -->
+            <div class="section">
+                <h2>Driver Improvement Comparison</h2>
+                <p>Comparing best pace from first 2 rounds vs last 2 rounds</p>
+                <div class="table-container">
+                    <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Driver</th>
+      <th>Best (First 2)</th>
+      <th>Best (Last 2)</th>
+      <th>Improvement</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Guillermo Paret</td>
+      <td>102.37</td>
+      <td>100.91</td>
+      <td>1.46</td>
+    </tr>
+    <tr>
+      <td>Nick Johnson</td>
+      <td>103.89</td>
+      <td>102.48</td>
+      <td>1.41</td>
+    </tr>
+    <tr>
+      <td>Parker Thomas</td>
+      <td>103.35</td>
+      <td>102.20</td>
+      <td>1.15</td>
+    </tr>
+    <tr>
+      <td>Louis Gendron</td>
+      <td>102.99</td>
+      <td>102.08</td>
+      <td>0.91</td>
+    </tr>
+    <tr>
+      <td>Maximum Angry</td>
+      <td>104.80</td>
+      <td>103.89</td>
+      <td>0.91</td>
+    </tr>
+    <tr>
+      <td>John Pflibsen</td>
+      <td>103.46</td>
+      <td>102.61</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>Greg Kachadurian</td>
+      <td>102.01</td>
+      <td>101.18</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>Ricardo Swaby</td>
+      <td>102.95</td>
+      <td>102.18</td>
+      <td>0.77</td>
+    </tr>
+    <tr>
+      <td>Preston Parenti</td>
+      <td>103.56</td>
+      <td>102.82</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>Dave Carter</td>
+      <td>104.17</td>
+      <td>103.46</td>
+      <td>0.71</td>
+    </tr>
+    <tr>
+      <td>Donovan Bailey</td>
+      <td>102.00</td>
+      <td>101.30</td>
+      <td>0.70</td>
+    </tr>
+    <tr>
+      <td>Michael Landry</td>
+      <td>101.98</td>
+      <td>101.29</td>
+      <td>0.69</td>
+    </tr>
+    <tr>
+      <td>Philippe Brazeau</td>
+      <td>102.79</td>
+      <td>102.17</td>
+      <td>0.62</td>
+    </tr>
+    <tr>
+      <td>Dustin Rand</td>
+      <td>103.08</td>
+      <td>102.53</td>
+      <td>0.55</td>
+    </tr>
+    <tr>
+      <td>Hans Montes</td>
+      <td>103.80</td>
+      <td>103.36</td>
+      <td>0.44</td>
+    </tr>
+    <tr>
+      <td>Cyril Fortin</td>
+      <td>102.06</td>
+      <td>101.62</td>
+      <td>0.44</td>
+    </tr>
+    <tr>
+      <td>Harrison Miller</td>
+      <td>102.34</td>
+      <td>101.94</td>
+      <td>0.40</td>
+    </tr>
+    <tr>
+      <td>Alexandre Urie</td>
+      <td>102.69</td>
+      <td>102.33</td>
+      <td>0.36</td>
+    </tr>
+    <tr>
+      <td>Josh Popov</td>
+      <td>102.39</td>
+      <td>102.08</td>
+      <td>0.31</td>
+    </tr>
+    <tr>
+      <td>David St-Germain</td>
+      <td>103.35</td>
+      <td>103.17</td>
+      <td>0.18</td>
+    </tr>
+    <tr>
+      <td>Joris Butkus</td>
+      <td>101.00</td>
+      <td>100.94</td>
+      <td>0.06</td>
+    </tr>
+    <tr>
+      <td>Willie Mangram</td>
+      <td>101.91</td>
+      <td>101.91</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>Jeffrey Aroyan</td>
+      <td>101.78</td>
+      <td>101.90</td>
+      <td>-0.12</td>
+    </tr>
+    <tr>
+      <td>Dan Gomez</td>
+      <td>103.75</td>
+      <td>103.95</td>
+      <td>-0.20</td>
+    </tr>
+    <tr>
+      <td>Ross McLean</td>
+      <td>102.82</td>
+      <td>103.62</td>
+      <td>-0.80</td>
+    </tr>
+  </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Generated from OOFS S3 Sprint Race XML Data</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Last updated: 2026-02-26 10:24:40</p>
+        </div>
+    </div>
+    
+    <script>
+        // Plotly data
+        const plotData = [{"x": [1, 2, 3, 4], "y": [102.37, 101.85, 100.91, 101.84], "mode": "lines+markers", "name": "Guillermo Paret", "hovertemplate": "<b>Guillermo Paret</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 4], "y": [101.0, 101.02, 100.94], "mode": "lines+markers", "name": "Joris Butkus", "hovertemplate": "<b>Joris Butkus</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [2, 4], "y": [100.96, 102.18], "mode": "lines+markers", "name": "Avinash Ganti", "hovertemplate": "<b>Avinash Ganti</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.01, 101.17, 101.23, 101.18], "mode": "lines+markers", "name": "Greg Kachadurian", "hovertemplate": "<b>Greg Kachadurian</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [101.98, 101.28, 101.29, 101.71], "mode": "lines+markers", "name": "Michael Landry", "hovertemplate": "<b>Michael Landry</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.0, 101.71, 101.3, 101.9], "mode": "lines+markers", "name": "Donovan Bailey", "hovertemplate": "<b>Donovan Bailey</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 4], "y": [102.26, 101.78, 101.35, 101.9], "mode": "lines+markers", "name": "Jeffrey Aroyan", "hovertemplate": "<b>Jeffrey Aroyan</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.06, 102.5, 101.6, 101.62, 102.15], "mode": "lines+markers", "name": "Cyril Fortin", "hovertemplate": "<b>Cyril Fortin</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [2, 3, 4], "y": [102.68, 101.75, 102.39], "mode": "lines+markers", "name": "Kelyan Locatelli", "hovertemplate": "<b>Kelyan Locatelli</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 4], "y": [103.46, 101.84, 102.61], "mode": "lines+markers", "name": "John Pflibsen", "hovertemplate": "<b>John Pflibsen</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [4], "y": [101.9], "mode": "lines+markers", "name": "William Neron", "hovertemplate": "<b>William Neron</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 2, 3, 4], "y": [102.39, 101.91, 102.08, 102.26], "mode": "lines+markers", "name": "Josh Popov", "hovertemplate": "<b>Josh Popov</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.18, 101.91, 102.03, 102.37, 101.91], "mode": "lines+markers", "name": "Willie Mangram", "hovertemplate": "<b>Willie Mangram</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 3, 4], "y": [102.34, 102.15, 101.94, 102.57], "mode": "lines+markers", "name": "Harrison Miller", "hovertemplate": "<b>Harrison Miller</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.91, 102.79, 101.97, 102.17, 102.6], "mode": "lines+markers", "name": "Philippe Brazeau", "hovertemplate": "<b>Philippe Brazeau</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 3, 4], "y": [102.99, 102.08, 102.29], "mode": "lines+markers", "name": "Louis Gendron", "hovertemplate": "<b>Louis Gendron</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.62, 102.95, 102.5, 102.18, 102.71], "mode": "lines+markers", "name": "Ricardo Swaby", "hovertemplate": "<b>Ricardo Swaby</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [1, 2, 3, 4], "y": [103.35, 102.41, 102.48, 102.2], "mode": "lines+markers", "name": "Parker Thomas", "hovertemplate": "<b>Parker Thomas</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [102.69, 102.85, 102.72, 102.33, 102.87], "mode": "lines+markers", "name": "Alexandre Urie", "hovertemplate": "<b>Alexandre Urie</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 3, 4], "y": [103.97, 103.89, 102.48, 102.54], "mode": "lines+markers", "name": "Nick Johnson", "hovertemplate": "<b>Nick Johnson</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.34, 103.08, 103.06, 102.53, 102.6], "mode": "lines+markers", "name": "Dustin Rand", "hovertemplate": "<b>Dustin Rand</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.08, 102.82, 105.4, 104.58, 103.62], "mode": "lines+markers", "name": "Ross McLean", "hovertemplate": "<b>Ross McLean</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 3, 4], "y": [103.56, 102.82, 103.15], "mode": "lines+markers", "name": "Preston Parenti", "hovertemplate": "<b>Preston Parenti</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [4], "y": [102.89], "mode": "lines+markers", "name": "Richie Wood", "hovertemplate": "<b>Richie Wood</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [103.63, 103.35, 102.91, 105.93, 103.17], "mode": "lines+markers", "name": "David St-Germain", "hovertemplate": "<b>David St-Germain</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 3, 4], "y": [104.12, 103.8, 103.15, 103.36, 103.67], "mode": "lines+markers", "name": "Hans Montes", "hovertemplate": "<b>Hans Montes</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 2, 4], "y": [104.58, 104.17, 103.5, 103.46], "mode": "lines+markers", "name": "Dave Carter", "hovertemplate": "<b>Dave Carter</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}, {"x": [0, 1, 4], "y": [103.75, 103.81, 103.95], "mode": "lines+markers", "name": "Dan Gomez", "hovertemplate": "<b>Dan Gomez</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}}];
+        const plotLayout = {"title": "Sprint Race Pace Trend: After 5 Rounds", "xaxis": {"tickmode": "linear", "tick0": 0, "dtick": 1, "ticktext": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "tickvals": [0, 1, 2, 3, 4]}, "yaxis": {"title": "Race Pace % (vs Alien)", "range": [100.0, 107.0]}, "hovermode": "closest", "plot_bgcolor": "rgba(240, 240, 240, 0.5)", "height": 700, "width": 1000, "showlegend": false, "xaxis_range": [-0.6, 4.6]};
+        
+        Plotly.newPlot('paceChart', plotData, plotLayout, {responsive: true});
+    </script>
+</body>
+</html>
