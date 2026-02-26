@@ -1,6 +1,6 @@
 """
 Generate GitHub Pages HTML report from XML pace data
-This script processes XML files and generates an interactive pace statistics page.
+This script processes XML files and generates an interactive multi-page dashboard.
 """
 
 import os
@@ -12,13 +12,19 @@ import json
 from pathlib import Path
 
 # Configuration
-XML_FOLDER = 'xml/sprint'
-RACES = {
+SPRINT_RACES = {
     's3-sc1-r.xml': {'name': 'Portimao', 'ref_time': 103.14},
     's3-sc2-r.xml': {'name': 'Le Mans', 'ref_time': 235.31},
     's3-sc3-r.xml': {'name': 'Interlagos', 'ref_time': 93.65},
     's3-sc4-r.xml': {'name': 'Monza', 'ref_time': 99.01},
     's3-sc5-r.xml': {'name': 'Sebring', 'ref_time': 120.17},
+}
+
+MULTICLASS_RACES = {
+    's3-mc1.xml': {'name': 'Round 1', 'ref_time_p2ur': 242.50, 'ref_time_gt3': 281.30},
+    's3-mc2.xml': {'name': 'Round 2', 'ref_time_p2ur': 245.80, 'ref_time_gt3': 284.60},
+    's3-mc3.xml': {'name': 'Round 3', 'ref_time_p2ur': 241.90, 'ref_time_gt3': 279.40},
+    's3-mc4.xml': {'name': 'Round 4', 'ref_time_p2ur': 246.20, 'ref_time_gt3': 285.10},
 }
 
 DRIVER_REPLACEMENTS = {
@@ -32,6 +38,35 @@ DRIVER_REPLACEMENTS = {
     'Ayrton Senna': 'Ayrton Torres',
     'Avi Ganti': 'Avinash Ganti',
 }
+
+
+def get_sidebar_html(active_page):
+    """Generate sidebar navigation HTML"""
+    pages = {
+        'sprint-race': ('Sprint', 'Race Pace'),
+        'sprint-quali': ('Sprint', 'Quali Pace'),
+        'multiclass-p2ur-race': ('Multiclass P2UR', 'Race Pace'),
+        'multiclass-p2ur-quali': ('Multiclass P2UR', 'Quali Pace'),
+        'multiclass-gt3-race': ('Multiclass GT3', 'Race Pace'),
+        'multiclass-gt3-quali': ('Multiclass GT3', 'Quali Pace'),
+    }
+    
+    sidebar_html = '<nav class="sidebar"><div class="sidebar-content"><h3>📊 Dashboard</h3>'
+    
+    current_section = None
+    for page_key, (section, subsection) in pages.items():
+        if section != current_section:
+            if current_section is not None:
+                sidebar_html += '</ul></div>'
+            current_section = section
+            sidebar_html += f'<div class="section-group"><h4>{section}</h4><ul>'
+        
+        is_active = 'active' if page_key == active_page else ''
+        file_name = page_key.replace('-', '_') + '.html'
+        sidebar_html += f'<li><a href="{file_name}" class="{is_active}">{subsection}</a></li>'
+    
+    sidebar_html += '</ul></div></nav>'
+    return sidebar_html
 
 
 def extract_xml_drivers(xml_path):
@@ -222,279 +257,295 @@ def create_plotly_json(df2, time_lower=100.0, time_upper=107.0):
     }
 
 
-def main():
-    """Main execution function"""
-    print("Processing XML race data...")
+def get_sidebar_html(active_page):
+    """Generate sidebar navigation HTML"""
+    nav_items = [
+        ('sprint_race.html', 'Sprint', 'Race Pace'),
+        ('sprint_quali.html', 'Sprint', 'Quali Pace'),
+        ('multiclass_p2ur_race.html', 'Multiclass P2UR', 'Race Pace'),
+        ('multiclass_p2ur_quali.html', 'Multiclass P2UR', 'Quali Pace'),
+        ('multiclass_gt3_race.html', 'Multiclass GT3', 'Race Pace'),
+        ('multiclass_gt3_quali.html', 'Multiclass GT3', 'Quali Pace'),
+    ]
     
-    # Load and process all races
-    race_dfs = {}
-    for filename, race_info in RACES.items():
-        xml_path = os.path.join(XML_FOLDER, filename)
-        if os.path.exists(xml_path):
-            df = process_race_data(xml_path, race_info['name'], race_info['ref_time'])
-            if df is not None:
-                race_dfs[race_info['name']] = df
-                print(f"✓ Loaded {race_info['name']}")
-        else:
-            print(f"✗ File not found: {xml_path}")
+    sidebar_html = '<nav class="sidebar"><div class="sidebar-content"><h3>📊 Dashboard</h3>'
     
-    if not race_dfs:
-        print("Error: No race data found!")
-        return
+    current_section = None
+    for file_name, section, subsection in nav_items:
+        if section != current_section:
+            if current_section is not None:
+                sidebar_html += '</ul></div>'
+            current_section = section
+            sidebar_html += f'<div class="section-group"><h4>{section}</h4><ul>'
+        
+        is_active = 'active' if file_name == active_page else ''
+        sidebar_html += f'<li><a href="{file_name}" class="{is_active}">{subsection}</a></li>'
     
-    # Create comparison dataframe
-    print("\nCreating comparison dataframe...")
-    comparison_df = race_dfs['Portimao'][['Driver_name', 'laptime_sec', 'laptime_pct', 'laptime_pct_alien']].rename(
-        columns={
-            'laptime_sec': 'laptime_sec_sc1',
-            'laptime_pct': 'laptime_pct_sc1',
-            'laptime_pct_alien': 'laptime_pct_alien_sc1'
-        }
-    ).copy()
-    
-    race_order = ['Le Mans', 'Interlagos', 'Monza', 'Sebring']
-    race_codes = ['sc2', 'sc3', 'sc4', 'sc5']
-    
-    for race_name, race_code in zip(race_order, race_codes):
-        if race_name in race_dfs:
-            comparison_df = comparison_df.merge(
-                race_dfs[race_name][['Driver_name', 'laptime_sec', 'laptime_pct', 'laptime_pct_alien']].rename(
-                    columns={
-                        'laptime_sec': f'laptime_sec_{race_code}',
-                        'laptime_pct': f'laptime_pct_{race_code}',
-                        'laptime_pct_alien': f'laptime_pct_alien_{race_code}'
-                    }
-                ),
-                on='Driver_name',
-                how='outer'
-            )
-    
-    comparison_df['time_diff_pct'] = comparison_df['laptime_pct_alien_sc1'] - comparison_df['laptime_pct_alien_sc5']
-    comparison_df = comparison_df.sort_values('Driver_name').reset_index(drop=True)
-    
-    # Create improvement dataframe
-    print("Creating improvement comparison...")
-    improvement_df_2 = comparison_df[['Driver_name', 'laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                       'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 'laptime_pct_alien_sc5']].copy()
-    improvement_df_2 = improvement_df_2.replace(0.00, np.nan).dropna(subset=['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                                                               'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
-                                                                               'laptime_pct_alien_sc5'], how='all')
-    improvement_df_2['best_first_two'] = improvement_df_2[['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2']].min(axis=1)
-    improvement_df_2['best_last_two'] = improvement_df_2[['laptime_pct_alien_sc4', 'laptime_pct_alien_sc5']].min(axis=1)
-    improvement_df_2['improvement'] = improvement_df_2['best_first_two'] - improvement_df_2['best_last_two']
-    improvement_df_2 = improvement_df_2.sort_values('improvement', ascending=False)
-    
-    # Rename columns for display
-    df2_display = comparison_df[['Driver_name', 'laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                 'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 'laptime_pct_alien_sc5', 'time_diff_pct']].copy()
-    df2_display = df2_display.replace(0.00, np.nan).dropna(subset=['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                                                    'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
-                                                                    'laptime_pct_alien_sc5'], how='all')
-    df2_display['best_pct'] = df2_display[['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                            'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
-                                            'laptime_pct_alien_sc5']].min(axis=1)
-    df2_display = df2_display.sort_values('best_pct')
-    df2_display = df2_display.rename(columns={
-        'best_pct': 'Best Race Pace % (vs Alien)',
-        'laptime_pct_alien_sc1': 'Portimao Race Pace % (vs Alien)',
-        'laptime_pct_alien_sc2': 'Le Mans Race Pace % (vs Alien)',
-        'laptime_pct_alien_sc3': 'Interlagos Race Pace % (vs Alien)',
-        'laptime_pct_alien_sc4': 'Monza Race Pace % (vs Alien)',
-        'laptime_pct_alien_sc5': 'Sebring Race Pace % (vs Alien)',
-        'time_diff_pct': 'Race Pace % Diff'
-    })
-    
-    # Generate HTML tables
-    print("Generating HTML tables...")
-    pace_html, improvement_html = generate_html_tables(comparison_df, improvement_df_2)
-    
-    # Generate Plotly JSON
-    print("Generating interactive chart...")
-    plotly_data = create_plotly_json(df2_display)
-    
-    # Create docs folder if it doesn't exist
-    os.makedirs('docs', exist_ok=True)
-    
-    # Generate HTML file
-    print("Generating HTML page...")
-    html_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint Race Pace Statistics</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>
-        * {{
+    sidebar_html += '</ul></div></nav>'
+    return sidebar_html
+
+
+def get_css_styles():
+    """Return shared CSS styles for all pages"""
+    return """
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }}
+        }
         
-        body {{
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
             line-height: 1.6;
             padding: 20px;
-        }}
+            display: flex;
+        }
         
-        .container {{
-            max-width: 1400px;
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            gap: 20px;
+            max-width: 1600px;
             margin: 0 auto;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar-content h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        
+        .section-group {
+            margin-bottom: 20px;
+        }
+        
+        .section-group h4 {
+            color: #764ba2;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section-group ul {
+            list-style: none;
+        }
+        
+        .section-group li {
+            margin-bottom: 8px;
+        }
+        
+        .section-group a {
+            color: #555;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            display: block;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+        
+        .section-group a:hover {
+            background: #f0f0f0;
+            color: #667eea;
+        }
+        
+        .section-group a.active {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .container {
+            flex: 1;
             background: white;
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             overflow: hidden;
-        }}
+        }
         
-        header {{
+        header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px 20px;
+            padding: 30px 20px;
             text-align: center;
-        }}
+        }
         
-        header h1 {{
-            font-size: 2.5em;
+        header h1 {
+            font-size: 2em;
             margin-bottom: 10px;
-        }}
+        }
         
-        header p {{
-            font-size: 1.1em;
+        header p {
+            font-size: 1em;
             opacity: 0.9;
-        }}
+        }
         
-        .content {{
-            padding: 40px 20px;
-        }}
+        .content {
+            padding: 30px 20px;
+        }
         
-        .section {{
-            margin-bottom: 50px;
-        }}
+        .section {
+            margin-bottom: 40px;
+        }
         
-        .section h2 {{
+        .section h2 {
             color: #667eea;
-            font-size: 1.8em;
+            font-size: 1.6em;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 3px solid #667eea;
-        }}
+        }
         
-        .chart-container {{
+        .chart-container {
             background: #f8f9fa;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 30px;
-        }}
+        }
         
-        .table-container {{
+        .table-container {
             overflow-x: auto;
             background: #f8f9fa;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 30px;
-        }}
+        }
         
-        table {{
+        table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.95em;
-        }}
+        }
         
-        table thead {{
+        table thead {
             background: #667eea;
             color: white;
-        }}
+        }
         
-        table th {{
+        table th {
             padding: 12px;
             text-align: left;
             font-weight: 600;
-        }}
+        }
         
-        table td {{
+        table td {
             padding: 12px;
             border-bottom: 1px solid #e0e0e0;
-        }}
+        }
         
-        table tbody tr:hover {{
+        table tbody tr:hover {
             background: #e8eaf6;
-        }}
+        }
         
-        table tbody tr:nth-child(even) {{
+        table tbody tr:nth-child(even) {
             background: #f5f5f5;
-        }}
+        }
         
-        .footer {{
+        .footer {
             background: #f8f9fa;
             padding: 20px;
             text-align: center;
             color: #666;
             border-top: 1px solid #e0e0e0;
-        }}
+        }
         
-        @media (max-width: 768px) {{
-            header h1 {{
-                font-size: 1.8em;
-            }}
+        @media (max-width: 968px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
             
-            .content {{
-                padding: 20px 10px;
-            }}
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
             
-            table {{
+            header h1 {
+                font-size: 1.6em;
+            }
+            
+            table {
                 font-size: 0.85em;
-            }}
+            }
             
-            table th, table td {{
+            table th, table td {
                 padding: 8px;
-            }}
-        }}
-    </style>
+            }
+        }
+    """
+
+
+def generate_page(title, subtitle, sidebar_file, pace_html, improvement_html, plotly_data):
+    """Generate an HTML page with sidebar"""
+    sidebar = get_sidebar_html(sidebar_file)
+    css = get_css_styles()
+    
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>{css}</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🏁 Sprint Race Pace Statistics</h1>
-            <p>Performance Analysis Across 5 Championship Rounds</p>
-        </header>
-        
-        <div class="content">
-            <!-- Pace Trend Chart -->
-            <div class="section">
-                <h2>Race Pace Trend by Round</h2>
-                <div class="chart-container">
-                    <div id="paceChart" style="width:100%;height:700px;"></div>
+    <div class="main-wrapper">
+        {sidebar}
+        <div class="container">
+            <header>
+                <h1>{title}</h1>
+                <p>{subtitle}</p>
+            </header>
+            
+            <div class="content">
+                <!-- Pace Trend Chart -->
+                <div class="section">
+                    <h2>Pace Trend by Round</h2>
+                    <div class="chart-container">
+                        <div id="paceChart" style="width:100%;height:700px;"></div>
+                    </div>
+                </div>
+                
+                <!-- Pace vs Alien Table -->
+                <div class="section">
+                    <h2>Pace vs Alien - All Rounds</h2>
+                    <div class="table-container">
+                        {pace_html}
+                    </div>
+                </div>
+                
+                <!-- Improvement Comparison -->
+                <div class="section">
+                    <h2>Driver Improvement Comparison</h2>
+                    <p>Performance comparison across rounds</p>
+                    <div class="table-container">
+                        {improvement_html}
+                    </div>
                 </div>
             </div>
             
-            <!-- Pace vs Alien Table -->
-            <div class="section">
-                <h2>Pace vs Alien - All Races</h2>
-                <div class="table-container">
-                    {pace_html}
-                </div>
+            <div class="footer">
+                <p>Generated from OOFS S3 XML Race Data</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
             </div>
-            
-            <!-- Improvement Comparison -->
-            <div class="section">
-                <h2>Driver Improvement Comparison</h2>
-                <p>Comparing best pace from first 2 rounds vs last 2 rounds</p>
-                <div class="table-container">
-                    {improvement_html}
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>Generated from OOFS S3 Sprint Race XML Data</p>
-            <p style="font-size: 0.9em; margin-top: 10px;">Last updated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
         </div>
     </div>
     
     <script>
-        // Plotly data
         const plotData = {json.dumps(plotly_data['traces'])};
         const plotLayout = {json.dumps(plotly_data['layout'])};
         
@@ -503,18 +554,167 @@ def main():
 </body>
 </html>
 """
+
+
+def main():
+    """Main execution function"""
+    print("Processing XML race data...\n")
     
-    # Write HTML file
-    with open('docs/index.html', 'w') as f:
-        f.write(html_content)
+    # Create docs folder
+    os.makedirs('docs', exist_ok=True)
     
-    print("✓ HTML page generated: docs/index.html")
+    # ===== SPRINT RACE PACE =====
+    print("Processing Sprint Race Pace...")
+    race_dfs = {}
+    for filename, race_info in SPRINT_RACES.items():
+        xml_path = os.path.join('xml/sprint', filename)
+        if os.path.exists(xml_path):
+            df = process_race_data(xml_path, race_info['name'], race_info['ref_time'])
+            if df is not None:
+                race_dfs[race_info['name']] = df
+                print(f"  ✓ Loaded {race_info['name']}")
+        else:
+            print(f"  ✗ File not found: {xml_path}")
+    
+    if race_dfs:
+        # Create comparison dataframe
+        comparison_df = race_dfs['Portimao'][['Driver_name', 'laptime_sec', 'laptime_pct', 'laptime_pct_alien']].rename(
+            columns={
+                'laptime_sec': 'laptime_sec_sc1',
+                'laptime_pct': 'laptime_pct_sc1',
+                'laptime_pct_alien': 'laptime_pct_alien_sc1'
+            }
+        ).copy()
+        
+        race_order = ['Le Mans', 'Interlagos', 'Monza', 'Sebring']
+        race_codes = ['sc2', 'sc3', 'sc4', 'sc5']
+        
+        for race_name, race_code in zip(race_order, race_codes):
+            if race_name in race_dfs:
+                comparison_df = comparison_df.merge(
+                    race_dfs[race_name][['Driver_name', 'laptime_sec', 'laptime_pct', 'laptime_pct_alien']].rename(
+                        columns={
+                            'laptime_sec': f'laptime_sec_{race_code}',
+                            'laptime_pct': f'laptime_pct_{race_code}',
+                            'laptime_pct_alien': f'laptime_pct_alien_{race_code}'
+                        }
+                    ),
+                    on='Driver_name',
+                    how='outer'
+                )
+        
+        comparison_df['time_diff_pct'] = comparison_df['laptime_pct_alien_sc1'] - comparison_df['laptime_pct_alien_sc5']
+        comparison_df = comparison_df.sort_values('Driver_name').reset_index(drop=True)
+        
+        # Improvement dataframe
+        improvement_df_2 = comparison_df[['Driver_name', 'laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
+                                           'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 'laptime_pct_alien_sc5']].copy()
+        improvement_df_2 = improvement_df_2.replace(0.00, np.nan).dropna(subset=['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
+                                                                                   'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
+                                                                                   'laptime_pct_alien_sc5'], how='all')
+        improvement_df_2['best_first_two'] = improvement_df_2[['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2']].min(axis=1)
+        improvement_df_2['best_last_two'] = improvement_df_2[['laptime_pct_alien_sc4', 'laptime_pct_alien_sc5']].min(axis=1)
+        improvement_df_2['improvement'] = improvement_df_2['best_first_two'] - improvement_df_2['best_last_two']
+        improvement_df_2 = improvement_df_2.sort_values('improvement', ascending=False)
+        
+        # Display dataframe
+        df2_display = comparison_df[['Driver_name', 'laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
+                                     'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 'laptime_pct_alien_sc5', 'time_diff_pct']].copy()
+        df2_display = df2_display.replace(0.00, np.nan).dropna(subset=['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
+                                                                        'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
+                                                                        'laptime_pct_alien_sc5'], how='all')
+        df2_display['best_pct'] = df2_display[['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
+                                                'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
+                                                'laptime_pct_alien_sc5']].min(axis=1)
+        df2_display = df2_display.sort_values('best_pct')
+        
+        # Create renamed columns for display
+        df2_display_renamed = df2_display.rename(columns={
+            'laptime_pct_alien_sc1': 'Portimao Race Pace % (vs Alien)',
+            'laptime_pct_alien_sc2': 'Le Mans Race Pace % (vs Alien)',
+            'laptime_pct_alien_sc3': 'Interlagos Race Pace % (vs Alien)',
+            'laptime_pct_alien_sc4': 'Monza Race Pace % (vs Alien)',
+            'laptime_pct_alien_sc5': 'Sebring Race Pace % (vs Alien)',
+        })
+        
+        pace_html, improvement_html = generate_html_tables(comparison_df, improvement_df_2)
+        plotly_data = create_plotly_json(df2_display_renamed)
+        
+        html_content = generate_page(
+            '🏁 Sprint Race Pace',
+            'Performance Analysis Across 5 Championship Rounds',
+            'sprint_race.html',
+            pace_html,
+            improvement_html,
+            plotly_data
+        )
+        
+        with open('docs/sprint_race.html', 'w') as f:
+            f.write(html_content)
+        with open('docs/index.html', 'w') as f:
+            f.write(html_content)
+        
+        print("  ✓ Generated Sprint Race Pace page\n")
+    
+    # Generate stub pages for future data
+    print("Generating stub pages for upcoming features...\n")
+    
+    stub_pages = [
+        ('sprint_quali.html', '🏁 Sprint Quali Pace', 'Qualification Performance Across 5 Rounds'),
+        ('multiclass_p2ur_race.html', '🏆 Multiclass P2UR Race Pace', 'P2UR Race Performance Analysis'),
+        ('multiclass_p2ur_quali.html', '🏆 Multiclass P2UR Quali Pace', 'P2UR Qualification Performance'),
+        ('multiclass_gt3_race.html', '🏆 Multiclass GT3 Race Pace', 'GT3 Race Performance Analysis'),
+        ('multiclass_gt3_quali.html', '🏆 Multiclass GT3 Quali Pace', 'GT3 Qualification Performance'),
+    ]
+    
+    for page_file, page_title, page_subtitle in stub_pages:
+        stub_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{page_title}</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>{get_css_styles()}</style>
+</head>
+<body>
+    <div class="main-wrapper">
+        {get_sidebar_html(page_file)}
+        <div class="container">
+            <header>
+                <h1>{page_title}</h1>
+                <p>{page_subtitle}</p>
+            </header>
+            
+            <div class="content">
+                <div class="section">
+                    <h2>Coming Soon</h2>
+                    <p style="font-size: 1.1em; color: #667eea; text-align: center; padding: 40px 20px;">
+                        Data for this section is being prepared. Check back soon!
+                    </p>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>Generated from OOFS S3 XML Race Data</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+"""
+        with open(f'docs/{page_file}', 'w') as f:
+            f.write(stub_html)
+        print(f"  ✓ Generated {page_title}")
+    
+    print("\n✓ All pages generated successfully!")
     print("\nTo publish on GitHub Pages:")
     print("1. Commit and push changes to GitHub")
     print("2. Go to repository Settings > Pages")
     print("3. Select 'Deploy from a branch'")
     print("4. Choose 'main' branch and '/docs' folder")
-    print("5. Your page will be published at: https://<username>.github.io/<repo-name>/")
+    print("5. Your page will be published at: https://nitin95.github.io/oofs_s3_data_analytics/")
 
 
 if __name__ == '__main__':
