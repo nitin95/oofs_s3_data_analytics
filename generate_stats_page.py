@@ -12,6 +12,15 @@ import json
 from pathlib import Path
 
 # Configuration
+SPRINT_QUALIS = {
+    's3-sc1.xml': {'name': 'Portimao', 'ref_time': 103.14},
+    's3-sc2.xml': {'name': 'Le Mans', 'ref_time': 235.31},
+    's3-sc3.xml': {'name': 'Interlagos', 'ref_time': 93.65},
+    's3-sc4.xml': {'name': 'Monza', 'ref_time': 99.01},
+    's3-sc5.xml': {'name': 'Sebring', 'ref_time': 120.17},
+}
+
+
 SPRINT_RACES = {
     's3-sc1-r.xml': {'name': 'Portimao', 'ref_time': 103.14},
     's3-sc2-r.xml': {'name': 'Le Mans', 'ref_time': 235.31},
@@ -20,11 +29,18 @@ SPRINT_RACES = {
     's3-sc5-r.xml': {'name': 'Sebring', 'ref_time': 120.17},
 }
 
+MULTICLASS_QUALIS = {
+    's3-mc1.xml': {'name': 'Portimao', 'ref_time_p2ur': 91.53, 'ref_time_gt3': 103.14},
+    's3-mc2.xml': {'name': 'Le Mans', 'ref_time_p2ur': 206.83, 'ref_time_gt3': 235.31},
+    's3-mc3.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.65},
+    's3-mc4.xml': {'name': 'Monza', 'ref_time_p2ur': 87.27, 'ref_time_gt3': 99.01},
+}
+
 MULTICLASS_RACES = {
-    's3-mc1.xml': {'name': 'Round 1', 'ref_time_p2ur': 242.50, 'ref_time_gt3': 281.30},
-    's3-mc2.xml': {'name': 'Round 2', 'ref_time_p2ur': 245.80, 'ref_time_gt3': 284.60},
-    's3-mc3.xml': {'name': 'Round 3', 'ref_time_p2ur': 241.90, 'ref_time_gt3': 279.40},
-    's3-mc4.xml': {'name': 'Round 4', 'ref_time_p2ur': 246.20, 'ref_time_gt3': 285.10},
+    's3-mc1-r.xml': {'name': 'Portimao', 'ref_time_p2ur': 91.53, 'ref_time_gt3': 103.14},
+    's3-mc2-r.xml': {'name': 'Le Mans', 'ref_time_p2ur': 206.83, 'ref_time_gt3': 235.31},
+    's3-mc3-r.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.65},
+    's3-mc4-r.xml': {'name': 'Monza', 'ref_time_p2ur': 87.27, 'ref_time_gt3': 99.01},
 }
 
 DRIVER_REPLACEMENTS = {
@@ -38,6 +54,8 @@ DRIVER_REPLACEMENTS = {
     'Ayrton Senna': 'Ayrton Torres',
     'Avi Ganti': 'Avinash Ganti',
 }
+
+TRACK_NAMES = ['Portimao', 'Le Mans', 'Interlagos', 'Monza', 'Sebring', 'Paul Ricard', 'COTA', 'Spa']
 
 
 def get_sidebar_html(active_page):
@@ -81,6 +99,7 @@ def extract_xml_drivers(xml_path):
         driver_info = {}
         driver_info['Driver'] = driver_elem.findtext('Name', 'Unknown')
         driver_info['Car'] = driver_elem.findtext('CarType', 'Unknown')
+        driver_info['CarClass'] = driver_elem.findtext('CarClass', 'Unknown')
         driver_info['CarNumber'] = driver_elem.findtext('CarNumber', 'N/A')
         driver_info['Position'] = driver_elem.findtext('Position', 'N/A')
         driver_info['BestLapTime'] = driver_elem.findtext('BestLapTime', '')
@@ -155,26 +174,202 @@ def process_race_data(xml_path, race_name, ref_laptime):
     return df
 
 
-def generate_html_tables(comparison_df, improvement_df_2):
-    """Generate HTML table representations of dataframes"""
-    # Pace vs Alien table
-    pace_cols = ['Driver_name', 'laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                 'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 'laptime_pct_alien_sc5', 'time_diff_pct']
-    pace_table_df = comparison_df[pace_cols].rename(columns={
-        'Driver_name': 'Driver',
-        'laptime_pct_alien_sc1': 'Portimao',
-        'laptime_pct_alien_sc2': 'Le Mans',
-        'laptime_pct_alien_sc3': 'Interlagos',
-        'laptime_pct_alien_sc4': 'Monza',
-        'laptime_pct_alien_sc5': 'Sebring',
-        'time_diff_pct': 'Diff'
-    }).dropna(subset=['Portimao', 'Le Mans', 'Interlagos', 'Monza', 'Sebring'], how='all')
+def process_multiclass_race_data(xml_path, race_name, car_class, ref_laptime):
+    """Process a single multiclass race XML file, filtered by car class (P2UR or GT3)"""
+    tables = extract_xml_drivers(xml_path)
+    if not tables:
+        return None
     
+    df = tables[0].copy()
+    
+    # Filter by car class
+    if car_class.upper() == 'P2UR':
+        df = df[df['CarClass'].str.contains('LMP2_ELMS', case=False, na=False)]
+    elif car_class.upper() == 'GT3':
+        df = df[df['CarClass'].str.contains('GT3', case=False, na=False)]
+    
+    if df.empty:
+        return None
+    
+    df['laptime_sec'] = df['Best Lap  Laps'].apply(convert_laptime_to_seconds)
+    df['Driver_name'] = df['Driver'].apply(
+        lambda x: str(x).split('LMGT3')[0].strip() if 'LMGT3' in str(x) else str(x).strip()
+    )
+    
+    # Apply driver name replacements
+    for old, new in DRIVER_REPLACEMENTS.items():
+        df['Driver_name'].replace(old, new, inplace=True)
+    
+    # Calculate pace percentages
+    min_laptime = df[df['laptime_sec'] > 0]['laptime_sec'].min()
+    df['laptime_pct'] = round(min_laptime / df['laptime_sec'] * 100, 2) if min_laptime > 0 else 100
+    df['laptime_pct_alien'] = round(df['laptime_sec'] / ref_laptime * 100, 2) if ref_laptime > 0 else 100
+    
+    return df
+
+
+def extract_code_from_filename(filename, prefix):
+    """Extract race code from filename (e.g., 's3-sc1-r.xml' -> 'sc1')"""
+    # Remove prefix and extensions
+    name = filename.replace(f'{prefix}-', '').replace('-r.xml', '').replace('.xml', '')
+    return name
+
+
+def load_races_dynamically(config_dict, xml_folder, is_multiclass=False):
+    """
+    Load available races from config and return ordered lists.
+    
+    Returns:
+        - race_codes: List of race codes in order
+        - track_names: List of track names in order
+        - code_to_track: Dict mapping code to track name
+    """
+    loaded_races = {}
+    race_codes = []
+    track_names = []
+    code_to_track = {}
+    
+    # Get prefix from first filename for code extraction
+    first_filename = list(config_dict.keys())[0]
+    if first_filename.startswith('s3-sc'):
+        prefix = 's3-sc'
+    elif first_filename.startswith('s3-mc'):
+        prefix = 's3-mc'
+    else:
+        return race_codes, track_names, code_to_track
+    
+    # Sort config by filename to maintain order (s3-sc1, s3-sc2, etc.)
+    sorted_items = sorted(config_dict.items(), key=lambda x: x[0])
+    
+    for filename, race_info in sorted_items:
+        xml_path = os.path.join(xml_folder, filename)
+        if os.path.exists(xml_path):
+            track_name = race_info['name']
+            
+            # Extract code from filename
+            code = extract_code_from_filename(filename, prefix)
+            
+            # # Get appropriate ref_time
+            # if is_multiclass:
+            #     # For multiclass, we'll determine class later
+            #     pass  # We'll handle this separately
+            # else:
+            #     ref_time = race_info['ref_time']
+            
+            race_codes.append(code)
+            track_names.append(track_name)
+            code_to_track[code] = track_name
+    
+    return race_codes, track_names, code_to_track
+
+
+def process_races_into_comparison_df(dfs_dict, race_codes, code_to_track):
+    """
+    Build a comparison dataframe from loaded race dataframes.
+    
+    Args:
+        dfs_dict: Dictionary of {track_name: dataframe}
+        race_codes: List of race codes in order (e.g., ['sc1', 'sc2', 'sc3'])
+        code_to_track: Dict mapping code to track name
+    
+    Returns:
+        - comparison_df: Merged dataframe with all races
+        - pace_cols: List of pace column names
+    """
+    if not race_codes:
+        return None, []
+    
+    # Start with first race
+    first_code = race_codes[0]
+    first_track = code_to_track[first_code]
+    
+    if first_track not in dfs_dict:
+        return None, []
+    
+    comparison_df = dfs_dict[first_track][['Driver_name', 'laptime_sec', 'laptime_pct', 'laptime_pct_alien']].rename(
+        columns={
+            'laptime_sec': f'laptime_sec_{first_code}',
+            'laptime_pct': f'laptime_pct_{first_code}',
+            'laptime_pct_alien': f'laptime_pct_alien_{first_code}'
+        }
+    ).copy()
+    
+    pace_cols = [f'laptime_pct_alien_{first_code}']
+    
+    # Merge remaining races
+    for code in race_codes[1:]:
+        track_name = code_to_track[code]
+        if track_name in dfs_dict:
+            comparison_df = comparison_df.merge(
+                dfs_dict[track_name][['Driver_name', 'laptime_sec', 'laptime_pct', 'laptime_pct_alien']].rename(
+                    columns={
+                        'laptime_sec': f'laptime_sec_{code}',
+                        'laptime_pct': f'laptime_pct_{code}',
+                        'laptime_pct_alien': f'laptime_pct_alien_{code}'
+                    }
+                ),
+                on='Driver_name',
+                how='outer'
+            )
+            pace_cols.append(f'laptime_pct_alien_{code}')
+    
+    # Clean up
+    comparison_df = comparison_df.replace(0.00, np.nan).dropna(subset=pace_cols, how='all')
+    comparison_df = comparison_df.sort_values('Driver_name').reset_index(drop=True)
+    
+    return comparison_df, pace_cols
+
+
+def build_improvement_df(comparison_df, pace_cols):
+    """Build improvement dataframe from comparison df"""
+    improvement_df = comparison_df[['Driver_name'] + pace_cols].copy()
+    improvement_df = improvement_df.replace(0.00, np.nan).dropna(subset=pace_cols, how='all')
+    
+    # Calculate improvement only if we have at least 2 races
+    if len(pace_cols) >= 2:
+        improvement_df['best_first_two'] = improvement_df[pace_cols[:2]].min(axis=1)
+        improvement_df['best_last_two'] = improvement_df[pace_cols[-2:]].min(axis=1)
+        improvement_df['improvement'] = improvement_df['best_first_two'] - improvement_df['best_last_two']
+        improvement_df = improvement_df.sort_values('improvement', ascending=False)
+    
+    return improvement_df
+
+
+def create_display_df(comparison_df, pace_cols, track_names, mode='race'):
+    """Create display dataframe with renamed columns"""
+    display_df = comparison_df[['Driver_name'] + pace_cols].copy()
+    display_df = display_df.replace(0.00, np.nan).dropna(subset=pace_cols, how='all')
+    display_df['best_pct'] = display_df[pace_cols].min(axis=1)
+    display_df = display_df.sort_values('best_pct')
+    
+    # Build rename mapping
+    rename_map = {'Driver_name': 'Driver_name'}
+    for i, (col, track) in enumerate(zip(pace_cols, track_names)):
+        pace_type = 'Race' if mode == 'race' else 'Quali'
+        rename_map[col] = f'{track} {pace_type} Pace % (vs Alien)'
+    
+    display_df_renamed = display_df.rename(columns=rename_map)
+    return display_df_renamed, list(rename_map.values())[1:]  # Return column names minus Driver_name
+
+
+def generate_html_tables(comparison_df, improvement_df, track_names):
+    """Generate HTML table representations of dataframes with dynamic track names"""
+    # Pace vs Alien table
+    pace_cols = [col for col in comparison_df.columns if col.startswith('laptime_pct_alien_')]
+    
+    pace_table_df = comparison_df[['Driver_name'] + pace_cols].copy()
+    
+    # Build rename mapping for pace table
+    pace_rename = {'Driver_name': 'Driver'}
+    for track, col in zip(track_names, pace_cols):
+        pace_rename[col] = track
+    
+    pace_table_df = pace_table_df.rename(columns=pace_rename).dropna(subset=track_names, how='all')
     pace_html = pace_table_df.to_html(index=False, float_format=lambda x: f'{x:.2f}' if pd.notna(x) else '')
     
     # Improvement table
     improvement_cols = ['Driver_name', 'best_first_two', 'best_last_two', 'improvement']
-    improvement_table_df = improvement_df_2[improvement_cols].dropna(subset=['improvement']).rename(columns={
+    improvement_table_df = improvement_df[improvement_cols].dropna(subset=['improvement']).rename(columns={
         'Driver_name': 'Driver',
         'best_first_two': 'Best (First 2)',
         'best_last_two': 'Best (Last 2)',
@@ -186,32 +381,31 @@ def generate_html_tables(comparison_df, improvement_df_2):
     return pace_html, improvement_html
 
 
-def create_plotly_json(df2, time_lower=100.0, time_upper=107.0):
-    """Create Plotly JSON data for the interactive chart"""
-    track_cols = ['Portimao', 'Le Mans', 'Interlagos', 'Monza', 'Sebring']
-    col_mapping = {
-        'Portimao Race Pace % (vs Alien)': 'Portimao',
-        'Le Mans Race Pace % (vs Alien)': 'Le Mans',
-        'Interlagos Race Pace % (vs Alien)': 'Interlagos',
-        'Monza Race Pace % (vs Alien)': 'Monza',
-        'Sebring Race Pace % (vs Alien)': 'Sebring'
-    }
+def create_plotly_json(df_display_renamed, track_names, chart_title, y_axis_title, time_lower=100.0, time_upper=107.0):
+    """Create Plotly JSON data for the interactive chart with dynamic track names"""
+    # Get pace columns from display df (excluding Driver_name and best_pct)
+    pace_col_names = [col for col in df_display_renamed.columns if 'Pace %' in col]
+    
+    # Build column mapping from renamed columns back to track names
+    col_mapping = {}
+    for i, (track, col) in enumerate(zip(track_names, pace_col_names)):
+        col_mapping[col] = track
     
     # Build plot_df
-    plot_df = df2[['Driver_name'] + list(col_mapping.keys())].copy()
+    plot_df = df_display_renamed[['Driver_name'] + pace_col_names].copy()
     plot_df.rename(columns=col_mapping, inplace=True)
     plot_df = plot_df[plot_df[plot_df.columns[-1]].between(time_lower, time_upper)].reset_index(drop=True)
-    plot_df['best'] = plot_df[track_cols].min(axis=1, skipna=True)
+    plot_df['best'] = plot_df[track_names].min(axis=1, skipna=True)
     plot_df = plot_df.sort_values('best').reset_index(drop=True)
     
     # Create traces for Plotly
     traces = []
-    x_positions = list(range(len(track_cols)))
+    x_positions = list(range(len(track_names)))
     
     for idx, (_, row) in enumerate(plot_df.iterrows()):
         pts = []
-        for xi, col in enumerate(track_cols):
-            val = row.get(col)
+        for xi, track in enumerate(track_names):
+            val = row.get(track)
             if pd.notna(val):
                 pts.append((xi, val))
         
@@ -226,7 +420,7 @@ def create_plotly_json(df2, time_lower=100.0, time_upper=107.0):
             'mode': 'lines+markers',
             'name': row['Driver_name'],
             'hovertemplate': f"<b>{row['Driver_name']}</b><br>%{{customdata}}<br>Pace: %{{y:.2f}}%<extra></extra>",
-            'customdata': [track_cols[int(i)] for i in xs],
+            'customdata': [track_names[int(i)] for i in xs],
             'line': {'width': 2},
             'marker': {'size': 8}
         }
@@ -235,16 +429,14 @@ def create_plotly_json(df2, time_lower=100.0, time_upper=107.0):
     return {
         'traces': traces,
         'layout': {
-            'title': 'Sprint Race Pace Trend: After 5 Rounds',
+            'title': chart_title,
             'xaxis': {
-                'tickmode': 'linear',
-                'tick0': 0,
-                'dtick': 1,
-                'ticktext': track_cols,
+                'tickmode': 'array',
+                'ticktext': track_names,
                 'tickvals': x_positions
             },
             'yaxis': {
-                'title': 'Race Pace % (vs Alien)',
+                'title': y_axis_title,
                 'range': [time_lower, time_upper]
             },
             'hovermode': 'closest',
@@ -252,7 +444,7 @@ def create_plotly_json(df2, time_lower=100.0, time_upper=107.0):
             'height': 700,
             'width': 1000,
             'showlegend': False,
-            'xaxis_range': [-0.6, len(track_cols) - 1 + 0.6]
+            'xaxis_range': [-0.6, len(track_names) - 1 + 0.6]
         }
     }
 
@@ -577,136 +769,281 @@ def main():
             print(f"  ✗ File not found: {xml_path}")
     
     if race_dfs:
-        # Create comparison dataframe
-        comparison_df = race_dfs['Portimao'][['Driver_name', 'laptime_sec', 'laptime_pct', 'laptime_pct_alien']].rename(
-            columns={
-                'laptime_sec': 'laptime_sec_sc1',
-                'laptime_pct': 'laptime_pct_sc1',
-                'laptime_pct_alien': 'laptime_pct_alien_sc1'
-            }
-        ).copy()
+        # Get dynamic race codes and track names
+        race_codes, track_names, code_to_track = load_races_dynamically(SPRINT_RACES, 'xml/sprint')
         
-        race_order = ['Le Mans', 'Interlagos', 'Monza', 'Sebring']
-        race_codes = ['sc2', 'sc3', 'sc4', 'sc5']
+        # Build comparison dataframe dynamically
+        comparison_df, pace_cols = process_races_into_comparison_df(race_dfs, race_codes, code_to_track)
         
-        for race_name, race_code in zip(race_order, race_codes):
-            if race_name in race_dfs:
-                comparison_df = comparison_df.merge(
-                    race_dfs[race_name][['Driver_name', 'laptime_sec', 'laptime_pct', 'laptime_pct_alien']].rename(
-                        columns={
-                            'laptime_sec': f'laptime_sec_{race_code}',
-                            'laptime_pct': f'laptime_pct_{race_code}',
-                            'laptime_pct_alien': f'laptime_pct_alien_{race_code}'
-                        }
-                    ),
-                    on='Driver_name',
-                    how='outer'
-                )
-        
-        comparison_df['time_diff_pct'] = comparison_df['laptime_pct_alien_sc1'] - comparison_df['laptime_pct_alien_sc5']
-        comparison_df = comparison_df.sort_values('Driver_name').reset_index(drop=True)
-        
-        # Improvement dataframe
-        improvement_df_2 = comparison_df[['Driver_name', 'laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                           'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 'laptime_pct_alien_sc5']].copy()
-        improvement_df_2 = improvement_df_2.replace(0.00, np.nan).dropna(subset=['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                                                                   'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
-                                                                                   'laptime_pct_alien_sc5'], how='all')
-        improvement_df_2['best_first_two'] = improvement_df_2[['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2']].min(axis=1)
-        improvement_df_2['best_last_two'] = improvement_df_2[['laptime_pct_alien_sc4', 'laptime_pct_alien_sc5']].min(axis=1)
-        improvement_df_2['improvement'] = improvement_df_2['best_first_two'] - improvement_df_2['best_last_two']
-        improvement_df_2 = improvement_df_2.sort_values('improvement', ascending=False)
-        
-        # Display dataframe
-        df2_display = comparison_df[['Driver_name', 'laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                     'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 'laptime_pct_alien_sc5', 'time_diff_pct']].copy()
-        df2_display = df2_display.replace(0.00, np.nan).dropna(subset=['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                                                        'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
-                                                                        'laptime_pct_alien_sc5'], how='all')
-        df2_display['best_pct'] = df2_display[['laptime_pct_alien_sc1', 'laptime_pct_alien_sc2', 
-                                                'laptime_pct_alien_sc3', 'laptime_pct_alien_sc4', 
-                                                'laptime_pct_alien_sc5']].min(axis=1)
-        df2_display = df2_display.sort_values('best_pct')
-        
-        # Create renamed columns for display
-        df2_display_renamed = df2_display.rename(columns={
-            'laptime_pct_alien_sc1': 'Portimao Race Pace % (vs Alien)',
-            'laptime_pct_alien_sc2': 'Le Mans Race Pace % (vs Alien)',
-            'laptime_pct_alien_sc3': 'Interlagos Race Pace % (vs Alien)',
-            'laptime_pct_alien_sc4': 'Monza Race Pace % (vs Alien)',
-            'laptime_pct_alien_sc5': 'Sebring Race Pace % (vs Alien)',
-        })
-        
-        pace_html, improvement_html = generate_html_tables(comparison_df, improvement_df_2)
-        plotly_data = create_plotly_json(df2_display_renamed)
-        
-        html_content = generate_page(
-            '🏁 Sprint Race Pace',
-            'Performance Analysis Across 5 Championship Rounds',
-            'sprint_race.html',
-            pace_html,
-            improvement_html,
-            plotly_data
-        )
-        
-        with open('docs/sprint_race.html', 'w') as f:
-            f.write(html_content)
-        with open('docs/index.html', 'w') as f:
-            f.write(html_content)
-        
-        print("  ✓ Generated Sprint Race Pace page\n")
-    
-    # Generate stub pages for future data
-    print("Generating stub pages for upcoming features...\n")
-    
-    stub_pages = [
-        ('sprint_quali.html', '🏁 Sprint Quali Pace', 'Qualification Performance Across 5 Rounds'),
-        ('multiclass_p2ur_race.html', '🏆 Multiclass P2UR Race Pace', 'P2UR Race Performance Analysis'),
-        ('multiclass_p2ur_quali.html', '🏆 Multiclass P2UR Quali Pace', 'P2UR Qualification Performance'),
-        ('multiclass_gt3_race.html', '🏆 Multiclass GT3 Race Pace', 'GT3 Race Performance Analysis'),
-        ('multiclass_gt3_quali.html', '🏆 Multiclass GT3 Quali Pace', 'GT3 Qualification Performance'),
-    ]
-    
-    for page_file, page_title, page_subtitle in stub_pages:
-        stub_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{page_title}</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>{get_css_styles()}</style>
-</head>
-<body>
-    <div class="main-wrapper">
-        {get_sidebar_html(page_file)}
-        <div class="container">
-            <header>
-                <h1>{page_title}</h1>
-                <p>{page_subtitle}</p>
-            </header>
+        if comparison_df is not None:
+            improvement_df = build_improvement_df(comparison_df, pace_cols)
+            df_display_renamed, display_col_names = create_display_df(comparison_df, pace_cols, track_names, mode='race')
             
-            <div class="content">
-                <div class="section">
-                    <h2>Coming Soon</h2>
-                    <p style="font-size: 1.1em; color: #667eea; text-align: center; padding: 40px 20px;">
-                        Data for this section is being prepared. Check back soon!
-                    </p>
-                </div>
-            </div>
+            pace_html, improvement_html = generate_html_tables(comparison_df, improvement_df, track_names)
             
-            <div class="footer">
-                <p>Generated from OOFS S3 XML Race Data</p>
-                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-"""
-        with open(f'docs/{page_file}', 'w') as f:
-            f.write(stub_html)
-        print(f"  ✓ Generated {page_title}")
+            num_rounds = len(track_names)
+            plotly_data = create_plotly_json(
+                df_display_renamed, 
+                track_names, 
+                f'Sprint Race Pace Trend: After {num_rounds} Rounds',
+                'Race Pace % (vs Alien)'
+            )
+            
+            html_content = generate_page(
+                '🏁 Sprint Race Pace',
+                f'Performance Analysis Across {num_rounds} Championship Rounds',
+                'sprint_race.html',
+                pace_html,
+                improvement_html,
+                plotly_data
+            )
+            
+            with open('docs/sprint_race.html', 'w', encoding='utf-8-sig') as f:
+                f.write(html_content)
+            with open('docs/index.html', 'w', encoding='utf-8-sig') as f:
+                f.write(html_content)
+            
+            print("  ✓ Generated Sprint Race Pace page\n")
+    
+    # ===== SPRINT QUALI PACE =====
+    print("Processing Sprint Quali Pace...")
+    quali_dfs = {}
+    for filename, quali_info in SPRINT_QUALIS.items():
+        xml_path = os.path.join('xml/sprint', filename)
+        if os.path.exists(xml_path):
+            df = process_race_data(xml_path, quali_info['name'], quali_info['ref_time'])
+            if df is not None:
+                quali_dfs[quali_info['name']] = df
+                print(f"  ✓ Loaded {quali_info['name']}")
+        else:
+            print(f"  ✗ File not found: {xml_path}")
+    
+    if quali_dfs:
+        # Get dynamic race codes and track names
+        quali_codes, quali_track_names, quali_code_to_track = load_races_dynamically(SPRINT_QUALIS, 'xml/sprint')
+        
+        # Build comparison dataframe dynamically
+        comparison_df_quali, pace_cols_quali = process_races_into_comparison_df(quali_dfs, quali_codes, quali_code_to_track)
+        
+        if comparison_df_quali is not None:
+            improvement_df_quali = build_improvement_df(comparison_df_quali, pace_cols_quali)
+            df_quali_display_renamed, _ = create_display_df(comparison_df_quali, pace_cols_quali, quali_track_names, mode='quali')
+            
+            pace_html_quali, improvement_html_quali = generate_html_tables(comparison_df_quali, improvement_df_quali, quali_track_names)
+            
+            num_rounds_quali = len(quali_track_names)
+            plotly_data_quali = create_plotly_json(
+                df_quali_display_renamed,
+                quali_track_names,
+                f'Sprint Quali Pace Trend: After {num_rounds_quali} Rounds',
+                'Quali Pace % (vs Alien)'
+            )
+            
+            html_content_quali = generate_page(
+                '🏁 Sprint Quali Pace',
+                f'Qualification Performance Analysis Across {num_rounds_quali} Championship Rounds',
+                'sprint_quali.html',
+                pace_html_quali,
+                improvement_html_quali,
+                plotly_data_quali
+            )
+            
+            with open('docs/sprint_quali.html', 'w', encoding='utf-8-sig') as f:
+                f.write(html_content_quali)
+            
+            print("  ✓ Generated Sprint Quali Pace page\n")
+    
+    # ===== MULTICLASS P2UR RACE PACE =====
+    print("Processing Multiclass P2UR Race Pace...")
+    mc_p2ur_race_dfs = {}
+    for filename, mc_info in MULTICLASS_RACES.items():
+        xml_path = os.path.join('xml/multiclass', filename)
+        if os.path.exists(xml_path):
+            df = process_multiclass_race_data(xml_path, mc_info['name'], 'P2UR', mc_info['ref_time_p2ur'])
+            if df is not None:
+                mc_p2ur_race_dfs[mc_info['name']] = df
+                print(f"  ✓ Loaded {mc_info['name']}")
+        else:
+            print(f"  ✗ File not found: {xml_path}")
+    
+    if mc_p2ur_race_dfs:
+        # Get dynamic race codes and track names
+        mc_codes, mc_track_names, mc_code_to_track = load_races_dynamically(MULTICLASS_RACES, 'xml/multiclass')
+        
+        # Build comparison dataframe dynamically
+        comparison_df_mc_p2ur, pace_cols_mc_p2ur = process_races_into_comparison_df(mc_p2ur_race_dfs, mc_codes, mc_code_to_track)
+        
+        if comparison_df_mc_p2ur is not None:
+            improvement_df_mc_p2ur = build_improvement_df(comparison_df_mc_p2ur, pace_cols_mc_p2ur)
+            df_mc_p2ur_display_renamed, _ = create_display_df(comparison_df_mc_p2ur, pace_cols_mc_p2ur, mc_track_names, mode='race')
+            
+            pace_html_mc_p2ur, improvement_html_mc_p2ur = generate_html_tables(comparison_df_mc_p2ur, improvement_df_mc_p2ur, mc_track_names)
+            
+            num_rounds_mc = len(mc_track_names)
+            plotly_data_mc_p2ur = create_plotly_json(
+                df_mc_p2ur_display_renamed,
+                mc_track_names,
+                f'Multiclass P2UR Race Pace Trend: After {num_rounds_mc} Rounds',
+                'Race Pace % (vs Alien)'
+            )
+            
+            html_content_mc_p2ur = generate_page(
+                '🏆 Multiclass P2UR Race Pace',
+                f'P2UR Race Performance Analysis Across {num_rounds_mc} Championship Rounds',
+                'multiclass_p2ur_race.html',
+                pace_html_mc_p2ur,
+                improvement_html_mc_p2ur,
+                plotly_data_mc_p2ur
+            )
+            
+            with open('docs/multiclass_p2ur_race.html', 'w', encoding='utf-8-sig') as f:
+                f.write(html_content_mc_p2ur)
+            
+            print("  ✓ Generated Multiclass P2UR Race Pace page\n")
+    
+    # ===== MULTICLASS P2UR QUALI PACE =====
+    print("Processing Multiclass P2UR Quali Pace...")
+    mc_p2ur_quali_dfs = {}
+    for filename, mc_info in MULTICLASS_QUALIS.items():
+        xml_path = os.path.join('xml/multiclass', filename)
+        if os.path.exists(xml_path):
+            df = process_multiclass_race_data(xml_path, mc_info['name'], 'P2UR', mc_info['ref_time_p2ur'])
+            if df is not None:
+                mc_p2ur_quali_dfs[mc_info['name']] = df
+                print(f"  ✓ Loaded {mc_info['name']}")
+        else:
+            print(f"  ✗ File not found: {xml_path}")
+    
+    if mc_p2ur_quali_dfs:
+        # Get dynamic race codes and track names
+        mc_quali_codes, mc_quali_track_names, mc_quali_code_to_track = load_races_dynamically(MULTICLASS_QUALIS, 'xml/multiclass')
+        
+        # Build comparison dataframe dynamically
+        comparison_df_mc_p2ur_quali, pace_cols_mc_p2ur_quali = process_races_into_comparison_df(mc_p2ur_quali_dfs, mc_quali_codes, mc_quali_code_to_track)
+        
+        if comparison_df_mc_p2ur_quali is not None:
+            improvement_df_mc_p2ur_quali = build_improvement_df(comparison_df_mc_p2ur_quali, pace_cols_mc_p2ur_quali)
+            df_mc_p2ur_quali_display_renamed, _ = create_display_df(comparison_df_mc_p2ur_quali, pace_cols_mc_p2ur_quali, mc_quali_track_names, mode='quali')
+            
+            pace_html_mc_p2ur_quali, improvement_html_mc_p2ur_quali = generate_html_tables(comparison_df_mc_p2ur_quali, improvement_df_mc_p2ur_quali, mc_quali_track_names)
+            
+            num_rounds_mc_quali = len(mc_quali_track_names)
+            plotly_data_mc_p2ur_quali = create_plotly_json(
+                df_mc_p2ur_quali_display_renamed,
+                mc_quali_track_names,
+                f'Multiclass P2UR Quali Pace Trend: After {num_rounds_mc_quali} Rounds',
+                'Quali Pace % (vs Alien)'
+            )
+            
+            html_content_mc_p2ur_quali = generate_page(
+                '🏆 Multiclass P2UR Quali Pace',
+                f'P2UR Qualification Performance Analysis Across {num_rounds_mc_quali} Championship Rounds',
+                'multiclass_p2ur_quali.html',
+                pace_html_mc_p2ur_quali,
+                improvement_html_mc_p2ur_quali,
+                plotly_data_mc_p2ur_quali
+            )
+            
+            with open('docs/multiclass_p2ur_quali.html', 'w', encoding='utf-8-sig') as f:
+                f.write(html_content_mc_p2ur_quali)
+            
+            print("  ✓ Generated Multiclass P2UR Quali Pace page\n")
+    
+    # ===== MULTICLASS GT3 RACE PACE =====
+    print("Processing Multiclass GT3 Race Pace...")
+    mc_gt3_race_dfs = {}
+    for filename, mc_info in MULTICLASS_RACES.items():
+        xml_path = os.path.join('xml/multiclass', filename)
+        if os.path.exists(xml_path):
+            df = process_multiclass_race_data(xml_path, mc_info['name'], 'GT3', mc_info['ref_time_gt3'])
+            if df is not None:
+                mc_gt3_race_dfs[mc_info['name']] = df
+                print(f"  ✓ Loaded {mc_info['name']}")
+        else:
+            print(f"  ✗ File not found: {xml_path}")
+    
+    if mc_gt3_race_dfs:
+        # Get dynamic race codes and track names
+        mc_gt3_codes, mc_gt3_track_names, mc_gt3_code_to_track = load_races_dynamically(MULTICLASS_RACES, 'xml/multiclass')
+        
+        # Build comparison dataframe dynamically
+        comparison_df_mc_gt3, pace_cols_mc_gt3 = process_races_into_comparison_df(mc_gt3_race_dfs, mc_gt3_codes, mc_gt3_code_to_track)
+        
+        if comparison_df_mc_gt3 is not None:
+            improvement_df_mc_gt3 = build_improvement_df(comparison_df_mc_gt3, pace_cols_mc_gt3)
+            df_mc_gt3_display_renamed, _ = create_display_df(comparison_df_mc_gt3, pace_cols_mc_gt3, mc_gt3_track_names, mode='race')
+            
+            pace_html_mc_gt3, improvement_html_mc_gt3 = generate_html_tables(comparison_df_mc_gt3, improvement_df_mc_gt3, mc_gt3_track_names)
+            
+            num_rounds_mc_gt3 = len(mc_gt3_track_names)
+            plotly_data_mc_gt3 = create_plotly_json(
+                df_mc_gt3_display_renamed,
+                mc_gt3_track_names,
+                f'Multiclass GT3 Race Pace Trend: After {num_rounds_mc_gt3} Rounds',
+                'Race Pace % (vs Alien)'
+            )
+            
+            html_content_mc_gt3 = generate_page(
+                '🏆 Multiclass GT3 Race Pace',
+                f'GT3 Race Performance Analysis Across {num_rounds_mc_gt3} Championship Rounds',
+                'multiclass_gt3_race.html',
+                pace_html_mc_gt3,
+                improvement_html_mc_gt3,
+                plotly_data_mc_gt3
+            )
+            
+            with open('docs/multiclass_gt3_race.html', 'w', encoding='utf-8-sig') as f:
+                f.write(html_content_mc_gt3)
+            
+            print("  ✓ Generated Multiclass GT3 Race Pace page\n")
+    
+    # ===== MULTICLASS GT3 QUALI PACE =====
+    print("Processing Multiclass GT3 Quali Pace...")
+    mc_gt3_quali_dfs = {}
+    for filename, mc_info in MULTICLASS_QUALIS.items():
+        xml_path = os.path.join('xml/multiclass', filename)
+        if os.path.exists(xml_path):
+            df = process_multiclass_race_data(xml_path, mc_info['name'], 'GT3', mc_info['ref_time_gt3'])
+            if df is not None:
+                mc_gt3_quali_dfs[mc_info['name']] = df
+                print(f"  ✓ Loaded {mc_info['name']}")
+        else:
+            print(f"  ✗ File not found: {xml_path}")
+    
+    if mc_gt3_quali_dfs:
+        # Get dynamic race codes and track names
+        mc_gt3_quali_codes, mc_gt3_quali_track_names, mc_gt3_quali_code_to_track = load_races_dynamically(MULTICLASS_QUALIS, 'xml/multiclass')
+        
+        # Build comparison dataframe dynamically
+        comparison_df_mc_gt3_quali, pace_cols_mc_gt3_quali = process_races_into_comparison_df(mc_gt3_quali_dfs, mc_gt3_quali_codes, mc_gt3_quali_code_to_track)
+        
+        if comparison_df_mc_gt3_quali is not None:
+            improvement_df_mc_gt3_quali = build_improvement_df(comparison_df_mc_gt3_quali, pace_cols_mc_gt3_quali)
+            df_mc_gt3_quali_display_renamed, _ = create_display_df(comparison_df_mc_gt3_quali, pace_cols_mc_gt3_quali, mc_gt3_quali_track_names, mode='quali')
+            
+            pace_html_mc_gt3_quali, improvement_html_mc_gt3_quali = generate_html_tables(comparison_df_mc_gt3_quali, improvement_df_mc_gt3_quali, mc_gt3_quali_track_names)
+            
+            num_rounds_mc_gt3_quali = len(mc_gt3_quali_track_names)
+            plotly_data_mc_gt3_quali = create_plotly_json(
+                df_mc_gt3_quali_display_renamed,
+                mc_gt3_quali_track_names,
+                f'Multiclass GT3 Quali Pace Trend: After {num_rounds_mc_gt3_quali} Rounds',
+                'Quali Pace % (vs Alien)'
+            )
+            
+            html_content_mc_gt3_quali = generate_page(
+                '🏆 Multiclass GT3 Quali Pace',
+                f'GT3 Qualification Performance Analysis Across {num_rounds_mc_gt3_quali} Championship Rounds',
+                'multiclass_gt3_quali.html',
+                pace_html_mc_gt3_quali,
+                improvement_html_mc_gt3_quali,
+                plotly_data_mc_gt3_quali
+            )
+            
+            with open('docs/multiclass_gt3_quali.html', 'w', encoding='utf-8-sig') as f:
+                f.write(html_content_mc_gt3_quali)
+            
+            print("  ✓ Generated Multiclass GT3 Quali Pace page\n")
     
     print("\n✓ All pages generated successfully!")
     print("\nTo publish on GitHub Pages:")
