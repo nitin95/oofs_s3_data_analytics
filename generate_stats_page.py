@@ -492,9 +492,9 @@ def get_css_styles():
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #14161ff2;
             color: #333;
-            line-height: 1.6;
+            line-height: 0.5;
             padding: 20px;
             display: flex;
         }
@@ -509,7 +509,7 @@ def get_css_styles():
         
         .sidebar {
             width: 250px;
-            background: white;
+            background: black;
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             padding: 20px;
@@ -536,7 +536,7 @@ def get_css_styles():
         }
         
         .sidebar-content h3 {
-            color: #667eea;
+            color: #ccfc00;
             margin-bottom: 20px;
             font-size: 1.2em;
         }
@@ -546,7 +546,7 @@ def get_css_styles():
         }
         
         .section-group h4 {
-            color: #764ba2;
+            color: #ccfc00;
             font-size: 0.95em;
             margin-bottom: 10px;
             text-transform: uppercase;
@@ -562,7 +562,7 @@ def get_css_styles():
         }
         
         .section-group a {
-            color: #555;
+            color: white;
             text-decoration: none;
             padding: 8px 12px;
             border-radius: 5px;
@@ -572,39 +572,46 @@ def get_css_styles():
         }
         
         .section-group a:hover {
-            background: #f0f0f0;
-            color: #667eea;
+            background: #512f89;
+            color: #ccfc00;
         }
         
         .section-group a.active {
-            background: #667eea;
-            color: white;
+            background: #512f89;
+            color: #ccfc00;
             font-weight: 600;
         }
         
         .container {
             flex: 1;
-            background: white;
+            background: transparent;
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             overflow: hidden;
         }
         
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: transparent;
+            color: #ccfc00;
             padding: 30px 20px;
             text-align: center;
         }
         
         header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 3em;
         }
         
         header p {
             font-size: 1em;
             opacity: 0.9;
+        }
+        
+        .header-logo {
+            width: 250px;
+            height: 250px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 20px;
         }
         
         .content {
@@ -616,11 +623,11 @@ def get_css_styles():
         }
         
         .section h2 {
-            color: #667eea;
+            color: #ccfc00;
             font-size: 1.6em;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid gray;
         }
         
         .chart-container {
@@ -639,7 +646,7 @@ def get_css_styles():
         
         .table-container {
             overflow-x: auto;
-            background: #f8f9fa;
+            background: #14161ff2;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 30px;
@@ -652,7 +659,7 @@ def get_css_styles():
         }
         
         table thead {
-            background: #667eea;
+            background: #14161ff2;
             color: white;
         }
         
@@ -663,6 +670,7 @@ def get_css_styles():
         }
         
         table td {
+            color: white;
             padding: 12px;
             border-bottom: 1px solid #e0e0e0;
         }
@@ -672,11 +680,11 @@ def get_css_styles():
         }
         
         table tbody tr:nth-child(even) {
-            background: #f5f5f5;
+            background: gray;
         }
         
         .footer {
-            background: #f8f9fa;
+            background: transparent;
             padding: 20px;
             text-align: center;
             color: #666;
@@ -695,7 +703,12 @@ def get_css_styles():
             }
             
             header h1 {
-                font-size: 1.6em;
+                font-size: 2em;
+            }
+            
+            .header-logo {
+                width: 200px;
+                height: 200px;
             }
             
             table {
@@ -735,12 +748,18 @@ def get_css_styles():
             }
             
             header h1 {
-                font-size: 1.3em;
+                font-size: 1.5em;
                 margin-bottom: 5px;
             }
             
             header p {
                 font-size: 0.9em;
+            }
+            
+            .header-logo {
+                width: 150px;
+                height: 150px;
+                margin-bottom: 15px;
             }
             
             .content {
@@ -790,17 +809,25 @@ def get_css_styles():
             }
             
             header {
+                color: #ccfc00;
                 padding: 15px 10px;
                 border-radius: 8px 8px 0 0;
             }
             
             header h1 {
+                color: #ccfc00;
                 font-size: 1.1em;
                 margin-bottom: 3px;
             }
             
             header p {
                 font-size: 0.8em;
+            }
+            
+            .header-logo {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 10px;
             }
             
             .container {
@@ -816,6 +843,7 @@ def get_css_styles():
             }
             
             .section h2 {
+                color: #ccfc00;
                 font-size: 1.1em;
                 margin-bottom: 12px;
                 padding-bottom: 8px;
@@ -858,6 +886,7 @@ def get_css_styles():
             }
             
             .footer {
+                background: transparent;
                 padding: 15px 10px;
                 font-size: 0.75em;
             }
@@ -894,8 +923,8 @@ def generate_page(title, subtitle, sidebar_file, pace_html, improvement_html, pl
         {sidebar_section}
         <div class="container">
             <header>
+                <img src="logo.png" alt="Logo" class="header-logo">
                 <h1>{title}</h1>
-                <p>{subtitle}</p>
             </header>
             
             <div class="content">
@@ -918,7 +947,6 @@ def generate_page(title, subtitle, sidebar_file, pace_html, improvement_html, pl
                 <!-- Improvement Comparison -->
                 <div class="section">
                     <h2>Driver Improvement Comparison</h2>
-                    <p>Performance comparison across rounds</p>
                     <div class="table-container">
                         {improvement_html}
                     </div>
@@ -1009,7 +1037,7 @@ def main():
             )
             
             html_content = generate_page(
-                '🏁 Sprint Race Pace',
+                '🏁 Sprint Race Pace Data',
                 f'Performance Analysis Across {num_rounds} Championship Rounds',
                 'sprint_race.html',
                 pace_html,
@@ -1059,7 +1087,7 @@ def main():
             )
             
             html_content_quali = generate_page(
-                '🏁 Sprint Quali Pace',
+                '🏁 Sprint Quali Pace Data',
                 f'Qualification Performance Analysis Across {num_rounds_quali} Championship Rounds',
                 'sprint_quali.html',
                 pace_html_quali,
@@ -1107,7 +1135,7 @@ def main():
             )
             
             html_content_mc_p2ur = generate_page(
-                '🏆 Multiclass P2UR Race Pace',
+                '🏆 Multiclass P2UR Race Pace Data',
                 f'P2UR Race Performance Analysis Across {num_rounds_mc} Championship Rounds',
                 'multiclass_p2ur_race.html',
                 pace_html_mc_p2ur,
@@ -1155,7 +1183,7 @@ def main():
             )
             
             html_content_mc_p2ur_quali = generate_page(
-                '🏆 Multiclass P2UR Quali Pace',
+                '🏆 Multiclass P2UR Quali Pace Data',
                 f'P2UR Qualification Performance Analysis Across {num_rounds_mc_quali} Championship Rounds',
                 'multiclass_p2ur_quali.html',
                 pace_html_mc_p2ur_quali,
@@ -1203,7 +1231,7 @@ def main():
             )
             
             html_content_mc_gt3 = generate_page(
-                '🏆 Multiclass GT3 Race Pace',
+                '🏆 Multiclass GT3 Race Pace Data',
                 f'GT3 Race Performance Analysis Across {num_rounds_mc_gt3} Championship Rounds',
                 'multiclass_gt3_race.html',
                 pace_html_mc_gt3,
@@ -1251,7 +1279,7 @@ def main():
             )
             
             html_content_mc_gt3_quali = generate_page(
-                '🏆 Multiclass GT3 Quali Pace',
+                '🏆 Multiclass GT3 Quali Pace Data',
                 f'GT3 Qualification Performance Analysis Across {num_rounds_mc_gt3_quali} Championship Rounds',
                 'multiclass_gt3_quali.html',
                 pace_html_mc_gt3_quali,

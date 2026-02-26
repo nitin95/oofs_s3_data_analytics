@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏆 Multiclass GT3 Quali Pace</title>
+    <title>🏆 Multiclass GT3 Quali Pace Data</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         * {
@@ -14,9 +14,9 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #14161ff2;
             color: #333;
-            line-height: 1.6;
+            line-height: 0.5;
             padding: 20px;
             display: flex;
         }
@@ -31,7 +31,7 @@
         
         .sidebar {
             width: 250px;
-            background: white;
+            background: black;
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             padding: 20px;
@@ -58,7 +58,7 @@
         }
         
         .sidebar-content h3 {
-            color: #667eea;
+            color: #ccfc00;
             margin-bottom: 20px;
             font-size: 1.2em;
         }
@@ -68,7 +68,7 @@
         }
         
         .section-group h4 {
-            color: #764ba2;
+            color: #ccfc00;
             font-size: 0.95em;
             margin-bottom: 10px;
             text-transform: uppercase;
@@ -84,7 +84,7 @@
         }
         
         .section-group a {
-            color: #555;
+            color: white;
             text-decoration: none;
             padding: 8px 12px;
             border-radius: 5px;
@@ -94,39 +94,46 @@
         }
         
         .section-group a:hover {
-            background: #f0f0f0;
-            color: #667eea;
+            background: #512f89;
+            color: #ccfc00;
         }
         
         .section-group a.active {
-            background: #667eea;
-            color: white;
+            background: #512f89;
+            color: #ccfc00;
             font-weight: 600;
         }
         
         .container {
             flex: 1;
-            background: white;
+            background: transparent;
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             overflow: hidden;
         }
         
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: transparent;
+            color: #ccfc00;
             padding: 30px 20px;
             text-align: center;
         }
         
         header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 3em;
         }
         
         header p {
             font-size: 1em;
             opacity: 0.9;
+        }
+        
+        .header-logo {
+            width: 250px;
+            height: 250px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 20px;
         }
         
         .content {
@@ -138,11 +145,11 @@
         }
         
         .section h2 {
-            color: #667eea;
+            color: #ccfc00;
             font-size: 1.6em;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid gray;
         }
         
         .chart-container {
@@ -161,7 +168,7 @@
         
         .table-container {
             overflow-x: auto;
-            background: #f8f9fa;
+            background: #14161ff2;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 30px;
@@ -174,7 +181,7 @@
         }
         
         table thead {
-            background: #667eea;
+            background: #14161ff2;
             color: white;
         }
         
@@ -185,6 +192,7 @@
         }
         
         table td {
+            color: white;
             padding: 12px;
             border-bottom: 1px solid #e0e0e0;
         }
@@ -194,11 +202,11 @@
         }
         
         table tbody tr:nth-child(even) {
-            background: #f5f5f5;
+            background: gray;
         }
         
         .footer {
-            background: #f8f9fa;
+            background: transparent;
             padding: 20px;
             text-align: center;
             color: #666;
@@ -217,7 +225,12 @@
             }
             
             header h1 {
-                font-size: 1.6em;
+                font-size: 2em;
+            }
+            
+            .header-logo {
+                width: 200px;
+                height: 200px;
             }
             
             table {
@@ -257,12 +270,18 @@
             }
             
             header h1 {
-                font-size: 1.3em;
+                font-size: 1.5em;
                 margin-bottom: 5px;
             }
             
             header p {
                 font-size: 0.9em;
+            }
+            
+            .header-logo {
+                width: 150px;
+                height: 150px;
+                margin-bottom: 15px;
             }
             
             .content {
@@ -312,17 +331,25 @@
             }
             
             header {
+                color: #ccfc00;
                 padding: 15px 10px;
                 border-radius: 8px 8px 0 0;
             }
             
             header h1 {
+                color: #ccfc00;
                 font-size: 1.1em;
                 margin-bottom: 3px;
             }
             
             header p {
                 font-size: 0.8em;
+            }
+            
+            .header-logo {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 10px;
             }
             
             .container {
@@ -338,6 +365,7 @@
             }
             
             .section h2 {
+                color: #ccfc00;
                 font-size: 1.1em;
                 margin-bottom: 12px;
                 padding-bottom: 8px;
@@ -380,6 +408,7 @@
             }
             
             .footer {
+                background: transparent;
                 padding: 15px 10px;
                 font-size: 0.75em;
             }
@@ -398,8 +427,8 @@
     
         <div class="container">
             <header>
-                <h1>🏆 Multiclass GT3 Quali Pace</h1>
-                <p>GT3 Qualification Performance Analysis Across 4 Championship Rounds</p>
+                <img src="logo.png" alt="Logo" class="header-logo">
+                <h1>🏆 Multiclass GT3 Quali Pace Data</h1>
             </header>
             
             <div class="content">
@@ -630,7 +659,6 @@
                 <!-- Improvement Comparison -->
                 <div class="section">
                     <h2>Driver Improvement Comparison</h2>
-                    <p>Performance comparison across rounds</p>
                     <div class="table-container">
                         <table border="1" class="dataframe">
   <thead>
@@ -770,7 +798,7 @@
             
             <div class="footer">
                 <p>Generated from OOFS S3 XML Race Data</p>
-                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: 2026-02-26 12:12:09</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: 2026-02-26 16:10:20</p>
             </div>
         </div>
     </div>
