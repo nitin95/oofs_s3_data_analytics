@@ -34,6 +34,7 @@ MULTICLASS_QUALIS = {
     's3-mc2.xml': {'name': 'Le Mans', 'ref_time_p2ur': 206.83, 'ref_time_gt3': 235.31},
     's3-mc3.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.65},
     's3-mc4.xml': {'name': 'Monza', 'ref_time_p2ur': 87.27, 'ref_time_gt3': 99.01},
+    's3-mc5.xml': {'name': 'Sebring', 'ref_time_p2ur': 105.53, 'ref_time_gt3': 120.17},
 }
 
 MULTICLASS_RACES = {
@@ -41,6 +42,7 @@ MULTICLASS_RACES = {
     's3-mc2-r.xml': {'name': 'Le Mans', 'ref_time_p2ur': 206.83, 'ref_time_gt3': 235.31},
     's3-mc3-r.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.65},
     's3-mc4-r.xml': {'name': 'Monza', 'ref_time_p2ur': 87.27, 'ref_time_gt3': 99.01},
+    's3-mc5-r.xml': {'name': 'Sebring', 'ref_time_p2ur': 105.53, 'ref_time_gt3': 120.17},
 }
 
 DRIVER_REPLACEMENTS = {
