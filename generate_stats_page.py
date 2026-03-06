@@ -13,38 +13,40 @@ from pathlib import Path
 
 # Configuration
 SPRINT_QUALIS = {
-    's3-sc1.xml': {'name': 'Portimao', 'ref_time': 103.14},
-    's3-sc2.xml': {'name': 'Le Mans', 'ref_time': 235.31},
-    's3-sc3.xml': {'name': 'Interlagos', 'ref_time': 93.65},
+    's3-sc1.xml': {'name': 'Portimao', 'ref_time': 103.23},
+    's3-sc2.xml': {'name': 'Le Mans', 'ref_time': 235.4},
+    's3-sc3.xml': {'name': 'Interlagos', 'ref_time': 93.44},
     's3-sc4.xml': {'name': 'Monza', 'ref_time': 99.01},
-    's3-sc5.xml': {'name': 'Sebring', 'ref_time': 120.17},
+    's3-sc5.xml': {'name': 'Sebring', 'ref_time': 119.96},
     's3-sc6.xml': {'name': 'Paul Ricard', 'ref_time': 123.44},
 }
 
 
 SPRINT_RACES = {
-    's3-sc1-r.xml': {'name': 'Portimao', 'ref_time': 103.14},
-    's3-sc2-r.xml': {'name': 'Le Mans', 'ref_time': 235.31},
-    's3-sc3-r.xml': {'name': 'Interlagos', 'ref_time': 93.65},
-    's3-sc4-r.xml': {'name': 'Monza', 'ref_time': 99.01},
-    's3-sc5-r.xml': {'name': 'Sebring', 'ref_time': 120.17},
-    's3-sc6-r.xml': {'name': 'Paul Ricard', 'ref_time': 123.44},
+    's3-sc1-r.xml': {'name': 'Portimao', 'ref_time': 103.75},
+    's3-sc2-r.xml': {'name': 'Le Mans', 'ref_time': 236.58},
+    's3-sc3-r.xml': {'name': 'Interlagos', 'ref_time': 93.91},
+    's3-sc4-r.xml': {'name': 'Monza', 'ref_time': 99.51},
+    's3-sc5-r.xml': {'name': 'Sebring', 'ref_time': 120.56},
+    's3-sc6-r.xml': {'name': 'Paul Ricard', 'ref_time': 124.06},
 }
 
 MULTICLASS_QUALIS = {
-    's3-mc1.xml': {'name': 'Portimao', 'ref_time_p2ur': 91.53, 'ref_time_gt3': 103.14},
-    's3-mc2.xml': {'name': 'Le Mans', 'ref_time_p2ur': 206.83, 'ref_time_gt3': 235.31},
-    's3-mc3.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.65},
+    's3-mc1.xml': {'name': 'Portimao', 'ref_time_p2ur': 91.53, 'ref_time_gt3': 103.23},
+    's3-mc2.xml': {'name': 'Le Mans', 'ref_time_p2ur': 206.83, 'ref_time_gt3': 235.4},
+    's3-mc3.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.44},
     's3-mc4.xml': {'name': 'Monza', 'ref_time_p2ur': 87.27, 'ref_time_gt3': 99.01},
-    's3-mc5.xml': {'name': 'Sebring', 'ref_time_p2ur': 105.53, 'ref_time_gt3': 120.17},
+    's3-mc5.xml': {'name': 'Sebring', 'ref_time_p2ur': 105.53, 'ref_time_gt3': 119.96},
+    's3-mc6.xml': {'name': 'Paul Ricard', 'ref_time_p2ur': 109.24, 'ref_time_gt3': 123.44},
 }
 
 MULTICLASS_RACES = {
-    's3-mc1-r.xml': {'name': 'Portimao', 'ref_time_p2ur': 91.53, 'ref_time_gt3': 103.14},
-    's3-mc2-r.xml': {'name': 'Le Mans', 'ref_time_p2ur': 206.83, 'ref_time_gt3': 235.31},
-    's3-mc3-r.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.65},
-    's3-mc4-r.xml': {'name': 'Monza', 'ref_time_p2ur': 87.27, 'ref_time_gt3': 99.01},
-    's3-mc5-r.xml': {'name': 'Sebring', 'ref_time_p2ur': 105.53, 'ref_time_gt3': 120.17},
+    's3-mc1-r.xml': {'name': 'Portimao', 'ref_time_p2ur':91.99, 'ref_time_gt3': 103.75},
+    's3-mc2-r.xml': {'name': 'Le Mans', 'ref_time_p2ur': 207.86, 'ref_time_gt3': 236.58},
+    's3-mc3-r.xml': {'name': 'Interlagos', 'ref_time_p2ur': 83.27, 'ref_time_gt3': 93.91},
+    's3-mc4-r.xml': {'name': 'Monza', 'ref_time_p2ur': 87.70, 'ref_time_gt3': 99.51},
+    's3-mc5-r.xml': {'name': 'Sebring', 'ref_time_p2ur': 106.06, 'ref_time_gt3': 120.56},
+    's3-mc6-r.xml': {'name': 'Paul Ricard', 'ref_time_p2ur': 109.79, 'ref_time_gt3': 124.06},
 }
 
 DRIVER_REPLACEMENTS = {
@@ -365,6 +367,7 @@ def generate_html_tables(comparison_df, improvement_df, track_names):
     pace_cols = [col for col in comparison_df.columns if col.startswith('laptime_pct_alien_')]
     
     pace_table_df = comparison_df[['Driver_name'] + pace_cols].copy()
+    full_driver_names_pace = pace_table_df['Driver_name'].copy()  # Store full names before shortening
     
     # Convert driver names to "F. Lastname" format for space efficiency
     pace_table_df['Driver_name'] = pace_table_df['Driver_name'].apply(
@@ -379,9 +382,17 @@ def generate_html_tables(comparison_df, improvement_df, track_names):
     pace_table_df = pace_table_df.rename(columns=pace_rename).dropna(subset=track_names, how='all')
     pace_html = pace_table_df.to_html(index=False, float_format=lambda x: f'{x:.2f}' if pd.notna(x) else '')
     
+    # Inject full driver names as data attributes
+    full_names_in_pace = full_driver_names_pace[pace_table_df.index].tolist()
+    for i, full_name in enumerate(full_names_in_pace):
+        pace_html = pace_html.replace(f'<tr>', f'<tr data-driver="{full_name}">', 1)
+    
     # Improvement table
     improvement_cols = ['Driver_name', 'best_first_two', 'best_last_two', 'improvement']
-    improvement_table_df = improvement_df[improvement_cols].dropna(subset=['improvement']).rename(columns={
+    improvement_table_df = improvement_df[improvement_cols].dropna(subset=['improvement'])
+    full_driver_names_improvement = improvement_table_df['Driver_name'].copy()
+    
+    improvement_table_df = improvement_table_df.rename(columns={
         'Driver_name': 'Driver',
         'best_first_two': 'Best (First 2)',
         'best_last_two': 'Best (Last 2)',
@@ -389,6 +400,11 @@ def generate_html_tables(comparison_df, improvement_df, track_names):
     })
     
     improvement_html = improvement_table_df.to_html(index=False, float_format=lambda x: f'{x:.2f}' if pd.notna(x) else '')
+    
+    # Inject full driver names as data attributes
+    full_names_in_improvement = full_driver_names_improvement.tolist()
+    for i, full_name in enumerate(full_names_in_improvement):
+        improvement_html = improvement_html.replace(f'<tr>', f'<tr data-driver="{full_name}">', 1)
     
     return pace_html, improvement_html
 
@@ -434,7 +450,8 @@ def create_plotly_json(df_display_renamed, track_names, chart_title, y_axis_titl
             'hovertemplate': f"<b>{row['Driver_name']}</b><br>%{{customdata}}<br>Pace: %{{y:.2f}}%<extra></extra>",
             'customdata': [track_names[int(i)] for i in xs],
             'line': {'width': 2},
-            'marker': {'size': 8}
+            'marker': {'size': 8},
+            'opacity': 1.0
         }
         traces.append(trace)
     
@@ -899,6 +916,12 @@ def get_css_styles():
                 padding: 15px 10px;
                 font-size: 0.75em;
             }
+            
+            table tbody tr.highlighted {
+                background: #ccfc00 !important;
+                color: #14161f !important;
+                font-weight: 600;
+            }
         }
     """
 
@@ -993,6 +1016,119 @@ def generate_page(title, subtitle, sidebar_file, pace_html, improvement_html, pl
         const plotLayout = {json.dumps(plotly_data['layout'])};
         
         Plotly.newPlot('paceChart', plotData, plotLayout, {{responsive: true, displayModeBar: false}});
+        
+        // Function to highlight table rows by driver name
+        function highlightTableRows(driverName) {{
+            try {{
+                const rows = document.querySelectorAll('table tbody tr');
+                rows.forEach(row => {{
+                    const firstCell = row.cells[0].textContent.trim();
+                    if (firstCell === driverName) {{
+                        row.classList.add('highlighted');
+                    }}
+                }});
+            }} catch (e) {{
+                // Ignore errors if driver not found in tables
+            }}
+        }}
+        
+        // Function to clear table row highlights
+        function clearTableHighlights() {{
+            try {{
+                document.querySelectorAll('table tbody tr.highlighted').forEach(row => {{
+                    row.classList.remove('highlighted');
+                }});
+            }} catch (e) {{
+                // Ignore errors
+            }}
+        }}
+        
+        // Function to highlight trace by driver name
+        function highlightTrace(driverName) {{
+            try {{
+                const traceIndex = plotData.findIndex(trace => trace.name === driverName);
+                if (traceIndex === -1) {{
+                    return; // Driver not in graph, silently pass
+                }}
+                
+                const numTraces = plotData.length;
+                const opacities = [];
+                const lineWidths = [];
+                
+                for (let i = 0; i < numTraces; i++) {{
+                    if (i === traceIndex) {{
+                        opacities.push(1.0);
+                        lineWidths.push({{width: 3}});
+                    }} else {{
+                        opacities.push(0.2);
+                        lineWidths.push({{width: 1}});
+                    }}
+                }}
+                
+                Plotly.restyle('paceChart', {{'opacity': opacities, 'line': lineWidths}});
+            }} catch (e) {{
+                // Ignore errors if driver not found
+            }}
+        }}
+        
+        // Function to clear trace highlights
+        function clearTraceHighlights() {{
+            try {{
+                const numTraces = plotData.length;
+                const opacities = Array(numTraces).fill(1.0);
+                const lineWidths = Array(numTraces).fill({{width: 2}});
+                Plotly.restyle('paceChart', {{'opacity': opacities, 'line': lineWidths}});
+            }} catch (e) {{
+                // Ignore errors
+            }}
+        }}
+        
+        // Add hover effect to grey out non-hovered lines in graph
+        const paceChart = document.getElementById('paceChart');
+        
+        paceChart.on('plotly_hover', function(data) {{
+            const driverName = data.points[0].name;
+            const numTraces = plotData.length;
+            const opacities = [];
+            const lineWidths = [];
+            
+            for (let i = 0; i < numTraces; i++) {{
+                if (i === data.points[0].curveNumber) {{
+                    opacities.push(1.0);
+                    lineWidths.push({{width: 3}});
+                }} else {{
+                    opacities.push(0.2);
+                    lineWidths.push({{width: 1}});
+                }}
+            }}
+            
+            Plotly.restyle('paceChart', {{'opacity': opacities, 'line': lineWidths}});
+            highlightTableRows(driverName);
+        }});
+        
+        paceChart.on('plotly_unhover', function(data) {{
+            clearTraceHighlights();
+            clearTableHighlights();
+        }});
+        
+        // Add hover effect to table rows
+        document.addEventListener('DOMContentLoaded', function() {{
+            const rows = document.querySelectorAll('table tbody tr');
+            rows.forEach(row => {{
+                row.addEventListener('mouseenter', function() {{
+                    const driverName = this.getAttribute('data-driver');
+                    if (driverName) {{
+                        this.classList.add('highlighted');
+                        highlightTrace(driverName);
+                    }}
+                }});
+                
+                row.addEventListener('mouseleave', function() {{
+                    this.classList.remove('highlighted');
+                    clearTraceHighlights();
+                }});
+            }});
+        }});
         
         // Handle responsive resizing
         window.addEventListener('resize', function() {{
