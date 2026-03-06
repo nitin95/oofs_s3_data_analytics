@@ -519,7 +519,7 @@ def get_css_styles():
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: #14161ff2;
-            color: #333;
+            color: white;
             line-height: 0.5;
             padding: 20px;
             display: flex;
@@ -696,17 +696,17 @@ def get_css_styles():
         }
         
         table td {
-            color: white;
             padding: 12px;
             border-bottom: 1px solid #e0e0e0;
         }
         
         table tbody tr:hover {
-            background: #e8eaf6;
+            background: #e8eaf6 !important;
+            color: black;
         }
         
         table tbody tr:nth-child(even) {
-            background: gray;
+            background: #444;
         }
         
         .footer {
@@ -919,7 +919,7 @@ def get_css_styles():
             
             table tbody tr.highlighted {
                 background: #ccfc00 !important;
-                color: #14161f !important;
+                color: black !important;
                 font-weight: 600;
             }
         }
