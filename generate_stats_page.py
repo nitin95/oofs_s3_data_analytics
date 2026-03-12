@@ -19,6 +19,7 @@ SPRINT_QUALIS = {
     's3-sc4.xml': {'name': 'Monza', 'ref_time': 99.01},
     's3-sc5.xml': {'name': 'Sebring', 'ref_time': 119.96},
     's3-sc6.xml': {'name': 'Paul Ricard', 'ref_time': 123.44},
+    's3-sc7.xml': {'name': 'COTA', 'ref_time': 125.61},
 }
 
 
@@ -29,6 +30,7 @@ SPRINT_RACES = {
     's3-sc4-r.xml': {'name': 'Monza', 'ref_time': 99.51},
     's3-sc5-r.xml': {'name': 'Sebring', 'ref_time': 120.56},
     's3-sc6-r.xml': {'name': 'Paul Ricard', 'ref_time': 124.06},
+    's3-sc7-r.xml': {'name': 'COTA', 'ref_time': 126.24},
 }
 
 MULTICLASS_QUALIS = {
