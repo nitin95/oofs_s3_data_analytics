@@ -15,7 +15,7 @@ from pathlib import Path
 SPRINT_QUALIS = {
     's3-sc1.xml': {'name': 'Portimao', 'ref_time': 103.23},
     's3-sc2.xml': {'name': 'Le Mans', 'ref_time': 235.4},
-    's3-sc3.xml': {'name': 'Interlagos', 'ref_time': 93.44},
+    's3-sc3.xml': {'name': 'Interlagos', 'ref_time': 93.54},
     's3-sc4.xml': {'name': 'Monza', 'ref_time': 99.01},
     's3-sc5.xml': {'name': 'Sebring', 'ref_time': 119.96},
     's3-sc6.xml': {'name': 'Paul Ricard', 'ref_time': 123.44},
@@ -26,7 +26,7 @@ SPRINT_QUALIS = {
 SPRINT_RACES = {
     's3-sc1-r.xml': {'name': 'Portimao', 'ref_time': 103.75},
     's3-sc2-r.xml': {'name': 'Le Mans', 'ref_time': 236.58},
-    's3-sc3-r.xml': {'name': 'Interlagos', 'ref_time': 93.91},
+    's3-sc3-r.xml': {'name': 'Interlagos', 'ref_time': 94.01},
     's3-sc4-r.xml': {'name': 'Monza', 'ref_time': 99.51},
     's3-sc5-r.xml': {'name': 'Sebring', 'ref_time': 120.56},
     's3-sc6-r.xml': {'name': 'Paul Ricard', 'ref_time': 124.06},
@@ -36,7 +36,7 @@ SPRINT_RACES = {
 MULTICLASS_QUALIS = {
     's3-mc1.xml': {'name': 'Portimao', 'ref_time_p2ur': 91.53, 'ref_time_gt3': 103.23},
     's3-mc2.xml': {'name': 'Le Mans', 'ref_time_p2ur': 206.83, 'ref_time_gt3': 235.4},
-    's3-mc3.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.44},
+    's3-mc3.xml': {'name': 'Interlagos', 'ref_time_p2ur': 82.86, 'ref_time_gt3': 93.54},
     's3-mc4.xml': {'name': 'Monza', 'ref_time_p2ur': 87.27, 'ref_time_gt3': 99.01},
     's3-mc5.xml': {'name': 'Sebring', 'ref_time_p2ur': 105.53, 'ref_time_gt3': 119.96},
     's3-mc6.xml': {'name': 'Paul Ricard', 'ref_time_p2ur': 109.24, 'ref_time_gt3': 123.44},
@@ -45,7 +45,7 @@ MULTICLASS_QUALIS = {
 MULTICLASS_RACES = {
     's3-mc1-r.xml': {'name': 'Portimao', 'ref_time_p2ur':91.99, 'ref_time_gt3': 103.75},
     's3-mc2-r.xml': {'name': 'Le Mans', 'ref_time_p2ur': 207.86, 'ref_time_gt3': 236.58},
-    's3-mc3-r.xml': {'name': 'Interlagos', 'ref_time_p2ur': 83.27, 'ref_time_gt3': 93.91},
+    's3-mc3-r.xml': {'name': 'Interlagos', 'ref_time_p2ur': 83.27, 'ref_time_gt3': 94.01},
     's3-mc4-r.xml': {'name': 'Monza', 'ref_time_p2ur': 87.70, 'ref_time_gt3': 99.51},
     's3-mc5-r.xml': {'name': 'Sebring', 'ref_time_p2ur': 106.06, 'ref_time_gt3': 120.56},
     's3-mc6-r.xml': {'name': 'Paul Ricard', 'ref_time_p2ur': 109.79, 'ref_time_gt3': 124.06},
@@ -424,7 +424,14 @@ def create_plotly_json(df_display_renamed, track_names, chart_title, y_axis_titl
     # Build plot_df
     plot_df = df_display_renamed[['Driver_name'] + pace_col_names].copy()
     plot_df.rename(columns=col_mapping, inplace=True)
-    plot_df = plot_df[plot_df[plot_df.columns[-1]].between(time_lower, time_upper)].reset_index(drop=True)
+    
+    # Filter drivers who either attended the last race OR attended more than 3 races
+    plot_df['races_attended'] = plot_df[track_names].notna().sum(axis=1)
+    last_race_col = track_names[-1]
+    attended_last_race = plot_df[last_race_col].notna()
+    attended_3_plus_races = plot_df['races_attended'] > 3
+    plot_df = plot_df[attended_last_race | attended_3_plus_races].reset_index(drop=True)
+    
     plot_df['best'] = plot_df[track_names].min(axis=1, skipna=True)
     plot_df = plot_df.sort_values('best').reset_index(drop=True)
     
