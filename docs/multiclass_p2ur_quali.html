@@ -461,6 +461,7 @@
       <th>Sebring</th>
       <th>Paul Ricard</th>
       <th>COTA</th>
+      <th>Spa</th>
     </tr>
   </thead>
   <tbody>
@@ -473,6 +474,7 @@
       <td>102.73</td>
       <td>NaN</td>
       <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr data-driver="Brian Crane">
       <td>B. Crane</td>
@@ -483,6 +485,7 @@
       <td>103.09</td>
       <td>104.46</td>
       <td>103.28</td>
+      <td>NaN</td>
     </tr>
     <tr data-driver="Chris MacLennan">
       <td>C. MacLennan</td>
@@ -493,6 +496,7 @@
       <td>103.79</td>
       <td>NaN</td>
       <td>103.41</td>
+      <td>103.77</td>
     </tr>
     <tr data-driver="Donovan Bailey">
       <td>D. Bailey</td>
@@ -503,6 +507,7 @@
       <td>101.52</td>
       <td>NaN</td>
       <td>101.38</td>
+      <td>NaN</td>
     </tr>
     <tr data-driver="Greg Kachadurian">
       <td>G. Kachadurian</td>
@@ -513,6 +518,7 @@
       <td>101.37</td>
       <td>100.84</td>
       <td>100.73</td>
+      <td>NaN</td>
     </tr>
     <tr data-driver="Hans Montes">
       <td>H. Montes</td>
@@ -523,6 +529,7 @@
       <td>103.25</td>
       <td>NaN</td>
       <td>103.27</td>
+      <td>102.91</td>
     </tr>
     <tr data-driver="James Rubio">
       <td>J. Rubio</td>
@@ -533,6 +540,7 @@
       <td>102.72</td>
       <td>102.58</td>
       <td>102.32</td>
+      <td>102.17</td>
     </tr>
     <tr data-driver="Joris Butkus">
       <td>J. Butkus</td>
@@ -542,6 +550,7 @@
       <td>NaN</td>
       <td>NaN</td>
       <td>100.81</td>
+      <td>NaN</td>
       <td>NaN</td>
     </tr>
     <tr data-driver="Michael Landry">
@@ -553,6 +562,7 @@
       <td>101.87</td>
       <td>101.21</td>
       <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr data-driver="Michael Quandt">
       <td>M. Quandt</td>
@@ -561,6 +571,7 @@
       <td>NaN</td>
       <td>101.84</td>
       <td>102.09</td>
+      <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
     </tr>
@@ -573,6 +584,7 @@
       <td>102.56</td>
       <td>101.95</td>
       <td>103.09</td>
+      <td>102.22</td>
     </tr>
     <tr data-driver="Ryan Bellune">
       <td>R. Bellune</td>
@@ -583,6 +595,7 @@
       <td>102.33</td>
       <td>103.83</td>
       <td>101.29</td>
+      <td>101.90</td>
     </tr>
   </tbody>
 </table>
@@ -612,14 +625,14 @@
     <tr data-driver="Nathan Sides">
       <td>Nathan Sides</td>
       <td>102.65</td>
-      <td>101.95</td>
-      <td>0.70</td>
+      <td>102.22</td>
+      <td>0.43</td>
     </tr>
     <tr data-driver="James Rubio">
       <td>James Rubio</td>
       <td>102.54</td>
-      <td>102.32</td>
-      <td>0.22</td>
+      <td>102.17</td>
+      <td>0.37</td>
     </tr>
     <tr data-driver="Chris MacLennan">
       <td>Chris MacLennan</td>
@@ -636,14 +649,8 @@
     <tr data-driver="Hans Montes">
       <td>Hans Montes</td>
       <td>103.02</td>
-      <td>103.27</td>
-      <td>-0.25</td>
-    </tr>
-    <tr data-driver="Michael Landry">
-      <td>Michael Landry</td>
-      <td>100.85</td>
-      <td>101.21</td>
-      <td>-0.36</td>
+      <td>102.91</td>
+      <td>0.11</td>
     </tr>
     <tr data-driver="Donovan Bailey">
       <td>Donovan Bailey</td>
@@ -665,7 +672,7 @@
             
             <div class="footer">
                 <p>Generated from OOFS S3 XML Race Data</p>
-                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: 2026-03-18 22:44:19</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">Last updated: 2026-03-19 22:57:04</p>
             </div>
         </div>
     </div>
@@ -690,8 +697,8 @@
         }
         
         // Plotly chart initialization
-        const plotData = [{"x": [0, 1, 2, 3, 4, 5, 6], "y": [101.67, 100.85, 101.15, 101.0, 101.37, 100.84, 100.73], "mode": "lines+markers", "name": "Greg Kachadurian", "hovertemplate": "<b>Greg Kachadurian</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "Paul Ricard", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4, 6], "y": [101.68, 100.93, 100.8, 100.84, 101.52, 101.38], "mode": "lines+markers", "name": "Donovan Bailey", "hovertemplate": "<b>Donovan Bailey</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 4, 5], "y": [101.62, 100.85, 100.93, 101.87, 101.21], "mode": "lines+markers", "name": "Michael Landry", "hovertemplate": "<b>Michael Landry</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring", "Paul Ricard"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 4, 5, 6], "y": [103.19, 102.06, 103.56, 102.33, 103.83, 101.29], "mode": "lines+markers", "name": "Ryan Bellune", "hovertemplate": "<b>Ryan Bellune</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring", "Paul Ricard", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4, 5, 6], "y": [103.33, 102.54, 102.54, 101.32, 102.72, 102.58, 102.32], "mode": "lines+markers", "name": "James Rubio", "hovertemplate": "<b>James Rubio</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "Paul Ricard", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4], "y": [102.71, 101.99, 103.28, 101.66, 102.73], "mode": "lines+markers", "name": "Abe Wozniak", "hovertemplate": "<b>Abe Wozniak</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4, 6], "y": [103.02, 103.19, 102.97, 101.8, 103.25, 103.27], "mode": "lines+markers", "name": "Hans Montes", "hovertemplate": "<b>Hans Montes</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 2, 3, 4, 5, 6], "y": [102.65, 102.3, 101.9, 102.56, 101.95, 103.09], "mode": "lines+markers", "name": "Nathan Sides", "hovertemplate": "<b>Nathan Sides</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring", "Paul Ricard", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 3, 4, 5, 6], "y": [103.81, 102.7, 102.94, 103.09, 104.46, 103.28], "mode": "lines+markers", "name": "Brian Crane", "hovertemplate": "<b>Brian Crane</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Monza", "Sebring", "Paul Ricard", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4, 6], "y": [105.5, 103.56, 104.69, 102.73, 103.79, 103.41], "mode": "lines+markers", "name": "Chris MacLennan", "hovertemplate": "<b>Chris MacLennan</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}];
-        const plotLayout = {"title": "Multiclass P2UR Quali Pace Trend: After 7 Rounds", "xaxis": {"tickmode": "array", "ticktext": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "Paul Ricard", "COTA"], "tickvals": [0, 1, 2, 3, 4, 5, 6]}, "yaxis": {"title": "Quali Pace % (vs Alien)", "range": [100.0, 107.0]}, "hovermode": "closest", "plot_bgcolor": "rgba(240, 240, 240, 0.5)", "height": 500, "autosize": true, "showlegend": false, "xaxis_range": [-0.6, 6.6], "margin": {"l": 50, "r": 20, "b": 50, "t": 60}};
+        const plotData = [{"x": [0, 1, 2, 3, 4, 5, 6], "y": [101.67, 100.85, 101.15, 101.0, 101.37, 100.84, 100.73], "mode": "lines+markers", "name": "Greg Kachadurian", "hovertemplate": "<b>Greg Kachadurian</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "Paul Ricard", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4, 6], "y": [101.68, 100.93, 100.8, 100.84, 101.52, 101.38], "mode": "lines+markers", "name": "Donovan Bailey", "hovertemplate": "<b>Donovan Bailey</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 4, 5], "y": [101.62, 100.85, 100.93, 101.87, 101.21], "mode": "lines+markers", "name": "Michael Landry", "hovertemplate": "<b>Michael Landry</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring", "Paul Ricard"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 4, 5, 6, 7], "y": [103.19, 102.06, 103.56, 102.33, 103.83, 101.29, 101.9], "mode": "lines+markers", "name": "Ryan Bellune", "hovertemplate": "<b>Ryan Bellune</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Sebring", "Paul Ricard", "COTA", "Spa"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4, 5, 6, 7], "y": [103.33, 102.54, 102.54, 101.32, 102.72, 102.58, 102.32, 102.17], "mode": "lines+markers", "name": "James Rubio", "hovertemplate": "<b>James Rubio</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "Paul Ricard", "COTA", "Spa"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4], "y": [102.71, 101.99, 103.28, 101.66, 102.73], "mode": "lines+markers", "name": "Abe Wozniak", "hovertemplate": "<b>Abe Wozniak</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4, 6, 7], "y": [103.02, 103.19, 102.97, 101.8, 103.25, 103.27, 102.91], "mode": "lines+markers", "name": "Hans Montes", "hovertemplate": "<b>Hans Montes</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "COTA", "Spa"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 2, 3, 4, 5, 6, 7], "y": [102.65, 102.3, 101.9, 102.56, 101.95, 103.09, 102.22], "mode": "lines+markers", "name": "Nathan Sides", "hovertemplate": "<b>Nathan Sides</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Interlagos", "Monza", "Sebring", "Paul Ricard", "COTA", "Spa"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 3, 4, 5, 6], "y": [103.81, 102.7, 102.94, 103.09, 104.46, 103.28], "mode": "lines+markers", "name": "Brian Crane", "hovertemplate": "<b>Brian Crane</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Monza", "Sebring", "Paul Ricard", "COTA"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}, {"x": [0, 1, 2, 3, 4, 6, 7], "y": [105.5, 103.56, 104.69, 102.73, 103.79, 103.41, 103.77], "mode": "lines+markers", "name": "Chris MacLennan", "hovertemplate": "<b>Chris MacLennan</b><br>%{customdata}<br>Pace: %{y:.2f}%<extra></extra>", "customdata": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "COTA", "Spa"], "line": {"width": 2}, "marker": {"size": 8}, "opacity": 1.0}];
+        const plotLayout = {"title": "Multiclass P2UR Quali Pace Trend: After 8 Rounds", "xaxis": {"tickmode": "array", "ticktext": ["Portimao", "Le Mans", "Interlagos", "Monza", "Sebring", "Paul Ricard", "COTA", "Spa"], "tickvals": [0, 1, 2, 3, 4, 5, 6, 7]}, "yaxis": {"title": "Quali Pace % (vs Alien)", "range": [100.0, 107.0]}, "hovermode": "closest", "plot_bgcolor": "rgba(240, 240, 240, 0.5)", "height": 500, "autosize": true, "showlegend": false, "xaxis_range": [-0.6, 7.6], "margin": {"l": 50, "r": 20, "b": 50, "t": 60}};
         
         Plotly.newPlot('paceChart', plotData, plotLayout, {responsive: true, displayModeBar: false});
         

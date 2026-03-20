@@ -43,6 +43,7 @@ MULTICLASS_QUALIS = {
     's3-mc5.xml': {'name': 'Sebring', 'ref_time_p2ur': 105.53, 'ref_time_gt3': 119.96},
     's3-mc6.xml': {'name': 'Paul Ricard', 'ref_time_p2ur': 109.24, 'ref_time_gt3': 123.44},
     's3-mc7.xml': {'name': 'COTA', 'ref_time_p2ur': 112.81, 'ref_time_gt3': 125.61},
+    's3-mc8.xml': {'name': 'Spa', 'ref_time_p2ur': 120.98, 'ref_time_gt3': 137.32},
 }
 
 MULTICLASS_RACES = {
@@ -53,6 +54,7 @@ MULTICLASS_RACES = {
     's3-mc5-r.xml': {'name': 'Sebring', 'ref_time_p2ur': 106.06, 'ref_time_gt3': 120.56},
     's3-mc6-r.xml': {'name': 'Paul Ricard', 'ref_time_p2ur': 109.79, 'ref_time_gt3': 123.97},
     's3-mc7-r.xml': {'name': 'COTA', 'ref_time_p2ur': 113.37, 'ref_time_gt3': 126.20},
+    's3-mc8-r.xml': {'name': 'Spa', 'ref_time_p2ur': 121.59, 'ref_time_gt3': 138.01},
 }
 
 DRIVER_REPLACEMENTS = {
